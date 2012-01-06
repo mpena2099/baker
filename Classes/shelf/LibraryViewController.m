@@ -29,9 +29,15 @@
 {
     NSLog(@"Sync button pushed");
     
+    // Create a new NSBundle pointer
+    NSBundle* mainBundle;
+    
+    // The Info.plist is considered the mainBundle.
+    mainBundle = [NSBundle mainBundle]; 
+
     // get info from json rest service
     // Create the request.
-    NSString * library_url = @"http://www.bakershelf.com/issues/issueslist.json";
+    NSString * library_url = [NSString stringWithFormat:@"%@issueslist.json", [mainBundle objectForInfoDictionaryKey:@"IssueListURL"]];
     
     NSURLRequest *theRequest=[NSURLRequest requestWithURL:[[NSURL alloc] initWithString:library_url]
                                               cachePolicy:NSURLRequestUseProtocolCachePolicy
