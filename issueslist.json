@@ -1,9 +1,9 @@
 {"issues":
 	[
-     { "mag" : "Magazine Title", "number" : "1", "date" : "2011-01-01" , "title" : "Title 1","descr" : "Title 1 Description", "issueurl" : "http://www.bakershelf.com/issues/1.zip", "coverurl" : "http://www.bakershelf.com/issues/cover1.png"},
-     { "mag" : "Magazine Title", "number" : "2", "date" : "2011-02-01" , "title" : "Title 2","descr" : "Title 2 Description", "issueurl" : "http://www.bakershelf.com/issues/2.zip", "coverurl" : "http://www.bakershelf.com/issues/cover2.png"},
-     { "mag" : "Magazine Title", "number" : "3", "date" : "2011-03-01" , "title" : "Title 3","descr" : "Title 3 Description", "issueurl" : "http://www.bakershelf.com/issues/3.zip", "coverurl" : "http://www.bakershelf.com//issues/cover3.png"},
-     { "mag" : "Magazine Title", "number" : "4", "date" : "2011-04-01" , "title" : "Title 4","descr" : "Title 4 Description", "issueurl" : "http://www.bakershelf.com/issues/4.zip", "coverurl" : "http://www.bakershelf.com/issues/cover4.png"},
-     { "mag" : "Magazine Title", "number" : "5", "date" : "2011-05-01" , "title" : "Title 5","descr" : "Title 5 Description", "issueurl" : "http://www.bakershelf.com/issues/5.zip", "coverurl" : "http://www.bakershelf.com/issues/cover5.png"}
+     { "mag" : "Magazine Title", "number" : "1", "date" : "2011-01-01" , "title" : "Title 1","descr" : "Title 1 Description", "issueurl" : "http://public.nin9creative.com/baker/issues/1.zip", "coverurl" : "http://public.nin9creative.com/baker/issues/cover1.png"},
+     { "mag" : "Magazine Title", "number" : "2", "date" : "2011-02-01" , "title" : "Title 2","descr" : "Title 2 Description", "issueurl" : "http://public.nin9creative.com/baker/issues/2.zip", "coverurl" : "http://public.nin9creative.com/baker/issues/cover2.png"},
+     { "mag" : "Magazine Title", "number" : "3", "date" : "2011-03-01" , "title" : "Title 3","descr" : "Title 3 Description", "issueurl" : "http://public.nin9creative.com/baker/issues/3.zip", "coverurl" : "http://public.nin9creative.com/baker/issues/cover3.png"},
+     { "mag" : "Magazine Title", "number" : "4", "date" : "2011-03-01" , "title" : "Title 4","descr" : "Title 4 Description", "issueurl" : "http://public.nin9creative.com/baker/issues/4.zip", "coverurl" : "http://public.nin9creative.com/baker/issues/cover4.png"},
+     { "mag" : "Magazine Title", "number" : "5", "date" : "2011-05-01" , "title" : "Title 5","descr" : "Title 5 Description", "issueurl" : "http://public.nin9creative.com/baker/issues/5.zip", "coverurl" : "http://public.nin9creative.com/baker/issues/cover5.png"}
      ]
 }
