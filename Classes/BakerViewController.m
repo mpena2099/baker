@@ -1469,7 +1469,6 @@
         [UIView beginAnimations:@"addToolbar" context:nil]; {
             [UIView setAnimationDuration:0.4];
             [toolbar sizeToFit];
-            //NSLog(@"• Toolbar X,Y %@ , %@",toolbar.frame.origin.x, toolbar.frame.origin.y);
             [toolbar setFrame:CGRectMake(0, 20, toolbar.frame.size.width, toolbar.frame.size.height)];
             [self.view addSubview:toolbar];
         }
@@ -1484,9 +1483,6 @@
             [toolbar setFrame:CGRectMake(0, -44, toolbar.frame.size.width, toolbar.frame.size.height)];
         }
         [UIView commitAnimations];
-        [toolbar sizeToFit];
-        [toolbar removeFromSuperview];
-        
         toolbar.tag=0;
     }
 }
