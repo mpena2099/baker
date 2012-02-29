@@ -25,6 +25,7 @@
 //  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // 
+
 #import "IssueViewController.h"
 #import "Issue.h"
 #import "Cover.h"
@@ -132,19 +133,14 @@
       }
       else if ([[issue status] intValue] == 2 ) // issue is downloaded - needs to be archived
       {
-          NSError * error = nil;
-          [[NSFileManager defaultManager] removeItemAtPath:[(Content *)[issue content] path]  error:&error];
-          if (error) {
-              // implement error handling
-          }
-          else {
-              Content * c = (Content *)[issue content];
-              [c setPath:@""];
-              [issue setStatus:[NSNumber numberWithInt:1]];
-              [buttonView setTitle:@"Download" forState:UIControlStateNormal];
-              // notify all interested parties of the archived content
-              [[NSNotificationCenter defaultCenter] postNotificationName:@"contentArchived" object:self]; // make sure its persisted!
-          }
+          UIAlertView *updateAlert = [[UIAlertView alloc] 
+                                      initWithTitle: @"Are you sure you want to archive this item?"
+                                      message: @"This item will be removed from your device. You may download it at anytime for free."
+                                      delegate: self
+                                      cancelButtonTitle: @"Cancel"
+                                      otherButtonTitles:@"Archive",nil];
+          [updateAlert show];
+          [updateAlert release];
       }
     }
 }
@@ -159,17 +155,17 @@
         BakerViewController * bvc = [BakerViewController alloc];
         
         [bvc initWithMaterial:issue];
-        [bvc hideStatusBar];
         
         [UIView beginAnimations:nil context:NULL];
         [UIView setAnimationDuration: 0.50];
         
         //Hook To MainView
-        [UIView setAnimationTransition:UIViewAnimationTransitionNone forView:navigationController.view cache:YES];
+        [UIView setAnimationTransition:UIViewAnimationTransitionCurlDown forView:navigationController.view cache:YES];
+        
+		[navigationController popViewControllerAnimated:YES];
+        [navigationController pushViewController:(UIViewController*)bvc animated:NO];    
         [navigationController setToolbarHidden:YES animated:NO];
         [navigationController setNavigationBarHidden:YES];
-        [navigationController pushViewController:(UIViewController*)bvc animated:YES];    
-
         
         [bvc release];
         
@@ -179,6 +175,26 @@
     {
         NSLog(@"Cannot read");        
     }
+}
+
+
+- (void) alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if(buttonIndex == 1){
+        NSError * error = nil;
+        [[NSFileManager defaultManager] removeItemAtPath:[(Content *)[issue content] path]  error:&error];
+        if (error) {
+            // implement error handling
+        } else {
+            Content * c = (Content *)[issue content];
+            [c setPath:@""];
+            [issue setStatus:[NSNumber numberWithInt:1]];
+            [buttonView setTitle:@"Download" forState:UIControlStateNormal];
+            // notify all interested parties of the archived content
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"contentArchived" object:self]; // make sure its persisted!
+        }
+    }
+    
 }
 
 - (void) resolvedCover:(NSNotification *) notification

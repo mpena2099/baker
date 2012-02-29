@@ -1,8 +1,8 @@
 //
-//  IssueViewController.h
+//  Toolbar.m
+//  Baker
 //
-//  Created by Bart Termorshuizen on 6/18/11.
-//  Modified/Adapted for BakerShelf by Andrew Krowczyk @nin9creative on 2/18/2012
+//  Created by Heberti Almeida on 26/02/12.
 //
 //  Redistribution and use in source and binary forms, with or without modification, are 
 //  permitted provided that the following conditions are met:
@@ -25,34 +25,32 @@
 //  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // 
-#import <UIKit/UIKit.h>
 
-@class Issue;
+#import "Toolbar.h"
+
+@implementation Toolbar
+
+/*
+- (id)initWithFrame:(CGRect)frame
+{
+    self = [super initWithFrame:frame];
+    if (self) {
+        // Initialization code
+        CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
+    }
+    return self;
+}
+*/
 
 
-@interface IssueViewController : UIViewController {
-    Issue* issue;
-    IBOutlet UILabel* labelView;
-    IBOutlet UITextView* descriptionView;
-    IBOutlet UIView* issueView;
-    IBOutlet UIImageView* coverView;
-    IBOutlet UIButton* buttonView;
-    IBOutlet UIProgressView* progressView;
+// Only override drawRect: if you perform custom drawing.
+// An empty implementation adversely affects performance during animation.
+- (void) drawRect:(CGRect)rect
+{
+    // Drawing code    
+    UIImage *image = [UIImage imageNamed:@"toolbar"];
+    [image drawAsPatternInRect:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height)];
 }
 
-@property (nonatomic, retain) Issue* issue;
 
-
--(IBAction) btnClicked:(id) sender;
--(IBAction) btnRead:(id) sender;
-
-- (void) resolvedCover:(NSNotification *) notification;
-- (void) downloadedContent:(NSNotification *) notification;
-
-@end
-
-
-@interface alertView: UIAlertView <UIActionSheetDelegate> {
-    
-}
 @end

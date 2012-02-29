@@ -29,7 +29,7 @@
 		<dict>
 			<key>CFBundleIconFiles</key>
 			<array>
-				<string>nkicon.png</string>
+				<string>newstand.png</string>
 			</array>
 			<key>UINewsstandBindingEdge</key>
 			<string>UINewsstandBindingEdgeLeft</string>

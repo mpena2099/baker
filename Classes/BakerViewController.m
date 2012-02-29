@@ -42,6 +42,7 @@
 #import "Utils.h"
 #import "Content.h"
 #import "BakerAppDelegate.h"
+#import "Toolbar.h"
 
 // ALERT LABELS
 #define OPEN_BOOK_MESSAGE       @"Do you want to download "
@@ -106,11 +107,14 @@
 
         orientation = [[UIApplication sharedApplication] statusBarOrientation];
         
+        //test to fix toolbar bug
+        [self hideStatusBar];
+        
         // ****** INIT PROPERTIES
         properties = [Properties properties];
         
         self.objIssue = _objIssue;
-        
+		
         // ****** DEVICE SCREEN BOUNDS
         screenBounds = [[UIScreen mainScreen] bounds];
         NSLog(@"    Device Width: %f", screenBounds.size.width);
@@ -158,7 +162,7 @@
                 
         //CGRectMake(0, 0, 1024, 44);
         // ****** TOOLBAR
-        toolbar = [[UIToolbar alloc]init];
+        toolbar = [[Toolbar alloc]init];
         toolbar.barStyle = UIBarStyleDefault;
         toolbar.tintColor = [UIColor blackColor];
         toolbar.tag = 0;
@@ -215,7 +219,7 @@
 }
 - (void)setPageSize:(NSString *)_orientation {
 	NSLog(@"• Set size for orientation: %@", _orientation);
-    
+	
     pageWidth = screenBounds.size.width;
     pageHeight = screenBounds.size.height;
 	if ([_orientation isEqualToString:@"landscape"]) {
@@ -993,8 +997,7 @@
                         }
                         
                         [self handleAnchor:YES];                        
-                    }
-                        
+                    }                   
                     else if ([webView isEqual:indexViewController.view])
                     {
                         discardNextStatusBarToggle = NO;
@@ -1064,7 +1067,7 @@
 		return NO;
 	}
 }
-- (void)webViewDidStartLoad:(UIWebView *)webView {
+- (void)webViewDidStartLoad:(UIWebView *)webView {	
     NSLog(@"• Page did start load");
     UITapGestureRecognizer* tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapGesture:)];
     tap.numberOfTapsRequired = 2;
@@ -1139,7 +1142,7 @@
 	}
 }
 - (void)webViewDidAppear:(UIWebView *)webView animating:(BOOL)animating {
-        
+		    
     if ([webView isEqual:currPage]) {
         
         // If is the first time i load something in the currPage web view...
@@ -1426,9 +1429,9 @@
 
     
 #pragma mark - CLOSE
--(void)Close
-{
-    NSLog(@"BakerViewController - Selected Back to Library Button");  
+-(void)Close {
+    NSLog(@"BakerViewController - Selected Back to Library Button");	
+	
     [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:NO];
     
     if ([[UIApplication sharedApplication] statusBarOrientation] == UIInterfaceOrientationPortraitUpsideDown || 
@@ -1450,39 +1453,36 @@
     [UIView setAnimationDuration: 0.50];
     
     //Hook To MainView
-    [UIView setAnimationTransition:UIViewAnimationTransitionNone forView:navigationController.view cache:YES];
+    [UIView setAnimationTransition:UIViewAnimationTransitionCurlUp forView:navigationController.view cache:YES];
+    
+    [navigationController popViewControllerAnimated:NO];    
     [navigationController setToolbarHidden:YES animated:NO];
-    [navigationController setNavigationBarHidden:YES];    
-    [navigationController popViewControllerAnimated:YES];    
-
+    [navigationController setNavigationBarHidden:YES];
     
     
     [UIView commitAnimations];
 }
 
 #pragma mark - TOOLBAR
--(void)showToolbar{
+-(void)showToolbar {
     if (toolbar.tag == 0) {
         [toolbar sizeToFit];
-        [toolbar setFrame:CGRectMake(0, -44, toolbar.frame.size.width, toolbar.frame.size.height)];
+        [toolbar setFrame:CGRectMake(toolbar.frame.origin.x, -44, toolbar.frame.size.width, toolbar.frame.size.height)];
         
         [UIView beginAnimations:@"addToolbar" context:nil]; {
-            [UIView setAnimationDuration:0.4];
-            [toolbar sizeToFit];
-            [toolbar setFrame:CGRectMake(0, 20, toolbar.frame.size.width, toolbar.frame.size.height)];
+            [UIView setAnimationDuration:0.35];
+            [toolbar setFrame:CGRectMake(toolbar.frame.origin.x, screenBounds.origin.y+20, toolbar.frame.size.width, toolbar.frame.size.height)];
             [self.view addSubview:toolbar];
         }
         [UIView commitAnimations];
         toolbar.tag=1;
         
-    }else
-    {
-        
+    } else {
         [UIView beginAnimations:@"removeToolbar" context:nil]; {
-            [UIView setAnimationDuration:0.5];
-            [toolbar setFrame:CGRectMake(0, -44, toolbar.frame.size.width, toolbar.frame.size.height)];
+            [UIView setAnimationDuration:0.35];
+			[toolbar setFrame:CGRectMake(toolbar.frame.origin.x, -44, toolbar.frame.size.width, toolbar.frame.size.height)];
         }
-        [UIView commitAnimations];
+        [UIView commitAnimations];        
         toolbar.tag=0;
     }
 }
@@ -1516,7 +1516,6 @@
 	discardNextStatusBarToggle = discardToggle;
 	[[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
     if(![indexViewController isDisabled]) {
-        
         [indexViewController setIndexViewHidden:YES withAnimation:YES];
     }
 }
@@ -1753,6 +1752,9 @@
 - (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
     // Notify the index view
     [indexViewController willRotate];
+    
+    //test to fix toolbar bug
+    [self hideStatusBar];
     
     // Since the UIWebView doesn't handle orientationchange events correctly we have to do handle them ourselves 
     // 1. Set the correct value for window.orientation property

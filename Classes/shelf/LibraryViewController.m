@@ -25,6 +25,7 @@
 //  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // 
+
 #import  "LibraryViewController.h"
 #include "IssueViewController.h"
 #include "BakerAppDelegate.h"
@@ -34,7 +35,6 @@
 
 #import "JSON.h"
 
-
 @implementation LibraryViewController
 
 @synthesize managedObjectContext;
@@ -43,24 +43,41 @@
 @synthesize numberOfPagesShown;
 
 
-//- (void)sync:(id) sender {
+//Sync button
 -(IBAction) sync:(id) sender
 {
-    NSLog(@"Sync button pushed");
+    [self updateList];
+}
+
+//Subscribe button
+-(IBAction) subscribe:(id) sender
+{
+    NSLog(@"Subscribe button pushed");
+	UIAlertView *someError = [[UIAlertView alloc] initWithTitle: @"Subscribe to Magazine" message: @"Subscription action!" delegate: self cancelButtonTitle: @"Ok" otherButtonTitles: nil];
+	
+	[someError show];
+	[someError release];
+}
+
+
+//Update magazine lists
+- (void) updateList
+{
+    NSLog(@"Sync Loaded...");
     
     // Create a new NSBundle pointer
     NSBundle* mainBundle;
     
     // The Info.plist is considered the mainBundle.
     mainBundle = [NSBundle mainBundle]; 
-
+    
     // get info from json rest service
     // Create the request.
-    NSString * library_url = [NSString stringWithFormat:@"%@issueslist_inapp.json", [mainBundle objectForInfoDictionaryKey:@"IssueListURL"]];
+    NSString * library_url = [NSString stringWithFormat:@"%@issueslist.json", [mainBundle objectForInfoDictionaryKey:@"IssueListURL"]];
     
     NSURLRequest *theRequest=[NSURLRequest requestWithURL:[[NSURL alloc] initWithString:library_url]
-                                              cachePolicy:NSURLRequestUseProtocolCachePolicy
-                                          timeoutInterval:60.0];
+                                  cachePolicy:NSURLRequestUseProtocolCachePolicy
+                                  timeoutInterval:60.0];
     
     // create the connection with the request
     // and start loading the data
@@ -72,8 +89,8 @@
     } else {
         NSLog(@"LibraryViewController - refresh: connection failed");
     }
-    return;
     
+    return;
 }
 
 - (void) resolvedCover:(NSNotification *) notification
@@ -88,6 +105,7 @@
             NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
             abort();
         }
+        
     }
 }
 
@@ -103,6 +121,7 @@
             NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
             abort();
         }
+        
     }
 }
 
@@ -119,6 +138,7 @@
             NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
             abort();
         }
+        
     }
 }
 
@@ -140,6 +160,8 @@
         NSInteger pageHeight = scrollView.frame.size.height;
         NSLog(@"pageWidth=%d, pageHeight=%d", pageWidth, pageHeight);
         
+        // Scrollview background repeat
+        //[scrollView setBackgroundColor:[UIColor colorWithPatternImage: [UIImage imageNamed:@"bg.png"]]];
         
         if (position == 1) // new page situation
         {
@@ -203,7 +225,7 @@
         NSInteger row = 0;
         NSInteger col = 0;
         //const NSInteger w = 320;
-        const NSInteger h = 282;
+        const NSInteger h = 304;
         
         
         if (position > 3) row = 1;
@@ -221,10 +243,12 @@
         // set col position
         switch (col) {
             case  1:
-                col = pageWidth/2 - 140;
+                //col = pageWidth/2 - 140;
+                col = pageWidth/2 - 165;
                 break;
             case  2:
-                col = pageWidth - 300;
+                //col = pageWidth - 300;
+                col = pageWidth - 330;
                 break;
         }
         
@@ -247,6 +271,7 @@
         [ivcView setFrame:frame];        
     }
     
+    
     return;
 }
 
@@ -259,6 +284,18 @@
         // get and set the managedObjectContext  from the appdelegate object
         BakerAppDelegate *appDelegate = (BakerAppDelegate *)[[UIApplication sharedApplication] delegate];
         [self setManagedObjectContext:[appDelegate managedObjectContext]];
+        
+        /*
+        UIBarButtonItem* syncButton = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh 
+                                                                                     target:self 
+                                                                                     action:@selector(sync:)] autorelease];
+        
+        
+        NSArray *items = [NSArray arrayWithObjects: 
+                          syncButton,
+                          nil];
+        [self setToolbarItems:items];
+        */
         
     }
     return self;
@@ -344,13 +381,22 @@
 }
 
 
-
+// Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     [self updateShelf:1];
     
+    //Library background
+    [[self view] setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"bg"]]];
+    
+    
+    //[[UIBarButtonItem appearance] setBackgroundColor:[UIColor colorWithRed:1.0 green:1.0 blue:1.0 alpha:1.0]];
+    
+    
+    [self updateList];
 }
+
 
 - (void)viewDidUnload
 {
@@ -370,20 +416,22 @@
 - (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation 
                                          duration:(NSTimeInterval)duration
 {
+    [shelfToolBar sizeToFit];
+    //shelfToolBar.frame = CGRectMake(0, 0, shelfToolBar.frame.size.width, shelfToolBar.frame.size.height);
     
     // Update the size/position of some objects
     if (toInterfaceOrientation == UIInterfaceOrientationLandscapeLeft ||
         toInterfaceOrientation == UIInterfaceOrientationLandscapeRight)
     {
-        scrollView.frame = CGRectMake(0, 239, 1024, 785); 
-        shelfToolBar.frame = CGRectMake(0, 0, 1024, 44);
-        shelfTitle.frame = CGRectMake(360, 11, 266, 21);
+        scrollView.frame = CGRectMake(0, 239, 1024, 785);
+		shelfImage.frame = CGRectMake(0, 44, 1024, 195);
+        shelfTitle.frame = CGRectMake(228, 0, shelfTitle.frame.size.width, shelfTitle.frame.size.height);
     }
     else
     {
-        scrollView.frame = CGRectMake(0, 239, 768, 785); 
-        shelfToolBar.frame = CGRectMake(0, 0, 768, 44);
-        shelfTitle.frame = CGRectMake(255, 11, 266, 21);
+        scrollView.frame = CGRectMake(0, 239, 768, 785);
+		shelfImage.frame = CGRectMake(0, 44, 768, 195);
+        shelfTitle.frame = CGRectMake(100, 0, shelfTitle.frame.size.width, shelfTitle.frame.size.height);
     }
     
     
@@ -468,8 +516,6 @@
         NSString *descr = [json_issue objectForKey:@"descr"];
         NSString *issueurl = [json_issue objectForKey:@"issueurl"];
         NSString *coverurl = [json_issue objectForKey:@"coverurl"];
-        NSString *price = [json_issue objectForKey:@"price"];
-        NSString *productid = [json_issue objectForKey:@"productid"];
         
         NSLog(@"%@ issue %@ with issueurl %@ and coverurl %@",mag, number,issueurl, coverurl);
         
@@ -511,10 +557,6 @@
             //set title, descr
             [newIssue setTitle:title];
             [newIssue setDescr:descr];
-            
-            //set price, InApp productid
-            [newIssue setProductid:productid];
-            [newIssue setPrice: [f numberFromString:price]];
             
             // set coverurl
             [newCover setUrl:coverurl];

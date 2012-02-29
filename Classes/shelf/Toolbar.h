@@ -1,8 +1,8 @@
 //
-//  IssueViewController.h
+//  Toolbar.h
+//  Baker
 //
-//  Created by Bart Termorshuizen on 6/18/11.
-//  Modified/Adapted for BakerShelf by Andrew Krowczyk @nin9creative on 2/18/2012
+//  Created by Heberti Almeida on 26/02/12.
 //
 //  Redistribution and use in source and binary forms, with or without modification, are 
 //  permitted provided that the following conditions are met:
@@ -25,34 +25,10 @@
 //  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // 
+
 #import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
 
-@class Issue;
+@interface Toolbar : UIToolbar
 
-
-@interface IssueViewController : UIViewController {
-    Issue* issue;
-    IBOutlet UILabel* labelView;
-    IBOutlet UITextView* descriptionView;
-    IBOutlet UIView* issueView;
-    IBOutlet UIImageView* coverView;
-    IBOutlet UIButton* buttonView;
-    IBOutlet UIProgressView* progressView;
-}
-
-@property (nonatomic, retain) Issue* issue;
-
-
--(IBAction) btnClicked:(id) sender;
--(IBAction) btnRead:(id) sender;
-
-- (void) resolvedCover:(NSNotification *) notification;
-- (void) downloadedContent:(NSNotification *) notification;
-
-@end
-
-
-@interface alertView: UIAlertView <UIActionSheetDelegate> {
-    
-}
 @end

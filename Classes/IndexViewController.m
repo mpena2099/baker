@@ -136,7 +136,7 @@
     
     if (animation) {
         [UIView beginAnimations:@"slideIndexView" context:nil]; {
-            [UIView setAnimationDuration:0.3];
+            [UIView setAnimationDuration:0.35];
             
             self.view.frame = frame;
         }
@@ -214,8 +214,9 @@
     if (height != [NSNull null]) {
         indexHeight = (int) [height integerValue];
     } else {
-        indexHeight = [webView sizeThatFits:CGSizeZero].height;        
+        indexHeight = [webView sizeThatFits:CGSizeZero].height;
     }
+    
     NSLog(@"Set height for IndexView to %d", indexHeight);
     
     // After the first load, point the delegate to the main view controller

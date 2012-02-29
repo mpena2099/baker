@@ -44,6 +44,7 @@
     
     IBOutlet UIToolbar *shelfToolBar;
     IBOutlet UILabel *shelfTitle;
+	IBOutlet UIImageView *shelfImage;
 }
 
 @property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
@@ -54,12 +55,14 @@
 
 //- (void)sync:(id) sender;
 -(IBAction) sync:(id) sender;
+-(IBAction) subscribe:(id) sender;
 
 //- (void) layout:(IssueViewController *)ivc;
 - (void) layout: (IssueViewController *)ivc setOrientation: (UIInterfaceOrientation) interfaceOrientation;
 - (void) resolvedCover:(NSNotification *) notification;
 - (void) downloadedContent:(NSNotification *) notification;
 - (void) archivedContent:(NSNotification *) notification;
+- (void) updateList;
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response;
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data;
