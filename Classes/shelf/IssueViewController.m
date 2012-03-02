@@ -232,6 +232,7 @@
                   [[UIApplication sharedApplication] setNewsstandIconImage:img];
                 [[UIApplication sharedApplication] setApplicationIconBadgeNumber:1];
               }
+                [img release];
             }
         }
     }

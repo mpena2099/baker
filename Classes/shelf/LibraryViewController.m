@@ -589,9 +589,6 @@
         } 
     }
     
-    //dealloc number formatter
-    [f dealloc];
-    
     // check if any covers have unresolved pics -> if so, (try to) resolve them
     for (Issue *issue in issuesArray){
         Cover *c =(Cover *)[issue cover];
@@ -613,7 +610,11 @@
         abort();
     }
     
+    [json_issues release];
+    [jsonString release];
     [connection release];
+    //dealloc number formatter
+    [f dealloc];
     [receivedData release];
     return;
 }

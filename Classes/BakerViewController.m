@@ -178,6 +178,9 @@
         
         // ****** SCROLLVIEW INIT
         self.scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, pageWidth, pageHeight)];
+        // This line below gives a "Potential leak of an object allocated on the previous line
+        // It should be ok as we are setting the Class Instance scrollView to a newly allocated UIScrollView
+        // This is being released in the dealloc, so the warning is just flagging a potential leak - it should be ok.
         scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         scrollView.showsHorizontalScrollIndicator = YES;
         scrollView.showsVerticalScrollIndicator = NO;
@@ -186,6 +189,7 @@
         scrollView.delegate = self;
         
         [self.view addSubview:scrollView];
+        [scrollView release];
         
         // ****** INDEX WEBVIEW INIT
         indexViewController = [[IndexViewController alloc] initWithBookBundlePath:bundleBookPath documentsBookPath:documentsBookPath fileName:INDEX_FILE_NAME webViewDelegate:self];
