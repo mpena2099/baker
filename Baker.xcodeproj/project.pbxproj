@@ -18,6 +18,7 @@
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
 		288765FD0DF74451002DB57D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765FC0DF74451002DB57D /* CoreGraphics.framework */; };
 		8D5A1C2814BCB722005BE276 /* newstand.png in Resources */ = {isa = PBXBuildFile; fileRef = 8D5A1C2714BCB722005BE276 /* newstand.png */; };
+		997041D51501670700D008F0 /* NewsstandKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 997041D41501670600D008F0 /* NewsstandKit.framework */; };
 		9E12CF091495A97E00FFB1DF /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E12CF081495A97E00FFB1DF /* CoreData.framework */; };
 		9E12CF131495AEB100FFB1DF /* IssueViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9E12CF0F1495AEB100FFB1DF /* IssueViewController.xib */; };
 		9E12CF141495AEB100FFB1DF /* LibraryViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9E12CF101495AEB100FFB1DF /* LibraryViewController.xib */; };
@@ -129,6 +130,7 @@
 		32CA4F630368D1EE00C91783 /* Baker_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Baker_Prefix.pch; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Baker-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Baker-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
 		8D5A1C2714BCB722005BE276 /* newstand.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = newstand.png; sourceTree = "<group>"; };
+		997041D41501670600D008F0 /* NewsstandKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NewsstandKit.framework; path = System/Library/Frameworks/NewsstandKit.framework; sourceTree = SDKROOT; };
 		9E12CF081495A97E00FFB1DF /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		9E12CF0F1495AEB100FFB1DF /* IssueViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = IssueViewController.xib; path = shelf/ui/IssueViewController.xib; sourceTree = "<group>"; };
 		9E12CF101495AEB100FFB1DF /* LibraryViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = LibraryViewController.xib; path = shelf/ui/LibraryViewController.xib; sourceTree = "<group>"; };
@@ -246,6 +248,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				997041D51501670700D008F0 /* NewsstandKit.framework in Frameworks */,
 				9E12CF091495A97E00FFB1DF /* CoreData.framework in Frameworks */,
 				1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */,
 				1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */,
@@ -278,9 +281,9 @@
 				D2B5B1ED141EA44800C8C333 /* lib */,
 				D2690B5D13EB46200011CC7D /* ui */,
 				D2A198A81375972600C6BE2F /* IndexViewController.h */,
+				D2A198A91375972600C6BE2F /* IndexViewController.m */,
 				9E57EFE914EAAB48000BD3B4 /* BakerViewController.h */,
 				9E57EFEA14EAAB48000BD3B4 /* BakerViewController.m */,
-				D2A198A91375972600C6BE2F /* IndexViewController.m */,
 				D20915BE13CB9C7800D3B55B /* Properties.h */,
 				D20915BF13CB9C7800D3B55B /* Properties.m */,
 				1D3623240D0F684500981E51 /* BakerAppDelegate.h */,
@@ -342,6 +345,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				997041D41501670600D008F0 /* NewsstandKit.framework */,
 				9E12CF081495A97E00FFB1DF /* CoreData.framework */,
 				1DF5F4DF0D08C38300B7A737 /* UIKit.framework */,
 				1D30AB110D05D00D00671497 /* Foundation.framework */,
