@@ -35,6 +35,7 @@
 
 #import "JSON.h"
 
+
 @implementation LibraryViewController
 
 @synthesize managedObjectContext;
@@ -76,8 +77,8 @@
     NSString * library_url = [NSString stringWithFormat:@"%@issueslist.json", [mainBundle objectForInfoDictionaryKey:@"IssueListURL"]];
     
     NSURLRequest *theRequest=[NSURLRequest requestWithURL:[[NSURL alloc] initWithString:library_url]
-                                  cachePolicy:NSURLRequestUseProtocolCachePolicy
-                                  timeoutInterval:60.0];
+                                              cachePolicy:NSURLRequestUseProtocolCachePolicy
+                                          timeoutInterval:60.0];
     
     // create the connection with the request
     // and start loading the data
@@ -89,6 +90,9 @@
     } else {
         NSLog(@"LibraryViewController - refresh: connection failed");
     }
+    
+    
+    
     
     return;
 }
@@ -506,6 +510,11 @@
     NSNumberFormatter * f = [[NSNumberFormatter alloc] init];
     [f setNumberStyle:NSNumberFormatterDecimalStyle];
     
+    
+    // shared NKLibrary instance
+    //NKLibrary *nkLib = [NKLibrary sharedLibrary];
+    
+    
     for (NSDictionary *json_issue in json_issues) {
         
         // Get mag, number,date, title, descr, issueurl, coverurl
@@ -586,8 +595,23 @@
             [scrollView addSubview:[ivc view]];
             
             [ivc release];
+            
+            /*
+            // Add new issue to to Newsstand                // <---------------------
+            NKIssue *nkIssue = [nkLib issueWithName:number];
+            if (!nkIssue) {
+                nkIssue = [nkLib addIssueWithName:number date:[dateFormatter dateFromString:date];
+            }
+             
+            [nkIssue release]; 
+            */
+            
         } 
     }
+    
+    
+    //[nkLib release];
+    
     
     // check if any covers have unresolved pics -> if so, (try to) resolve them
     for (Issue *issue in issuesArray){
