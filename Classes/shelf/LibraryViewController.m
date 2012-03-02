@@ -1,12 +1,32 @@
 //
 //  LibraryViewController.m
-//  SitelessMag
 //
 //  Created by Bart Termorshuizen on 6/17/11.
-//  Copyright 2011 __MyCompanyName__. All rights reserved.
+//  Modified/Adapted for BakerShelf by Andrew Krowczyk @nin9creative on 2/18/2012
 //
+//  Redistribution and use in source and binary forms, with or without modification, are 
+//  permitted provided that the following conditions are met:
+//  
+//  Redistributions of source code must retain the above copyright notice, this list of 
+//  conditions and the following disclaimer.
+//  Redistributions in binary form must reproduce the above copyright notice, this list of 
+//  conditions and the following disclaimer in the documentation and/or other materials 
+//  provided with the distribution.
+//  Neither the name of the Baker Framework nor the names of its contributors may be used to 
+//  endorse or promote products derived from this software without specific prior written 
+//  permission.
+//  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY 
+//  EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES 
+//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
+//  SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, 
+//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+//  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+//  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT 
+//  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+//  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+// 
 
-#import "LibraryViewController.h"
+#import  "LibraryViewController.h"
 #include "IssueViewController.h"
 #include "BakerAppDelegate.h"
 #include "Issue.h"
@@ -14,7 +34,6 @@
 #include "Content.h"
 
 #import "JSON.h"
-
 
 @implementation LibraryViewController
 
@@ -24,24 +43,41 @@
 @synthesize numberOfPagesShown;
 
 
-//- (void)sync:(id) sender {
+//Sync button
 -(IBAction) sync:(id) sender
 {
-    NSLog(@"Sync button pushed");
+    [self updateList];
+}
+
+//Subscribe button
+-(IBAction) subscribe:(id) sender
+{
+    NSLog(@"Subscribe button pushed");
+	UIAlertView *someError = [[UIAlertView alloc] initWithTitle: @"Subscribe to Magazine" message: @"Subscription action!" delegate: self cancelButtonTitle: @"Ok" otherButtonTitles: nil];
+	
+	[someError show];
+	[someError release];
+}
+
+
+//Update magazine lists
+- (void) updateList
+{
+    NSLog(@"Sync Loaded...");
     
     // Create a new NSBundle pointer
     NSBundle* mainBundle;
     
     // The Info.plist is considered the mainBundle.
     mainBundle = [NSBundle mainBundle]; 
-
+    
     // get info from json rest service
     // Create the request.
     NSString * library_url = [NSString stringWithFormat:@"%@issueslist.json", [mainBundle objectForInfoDictionaryKey:@"IssueListURL"]];
     
     NSURLRequest *theRequest=[NSURLRequest requestWithURL:[[NSURL alloc] initWithString:library_url]
-                                              cachePolicy:NSURLRequestUseProtocolCachePolicy
-                                          timeoutInterval:60.0];
+                                  cachePolicy:NSURLRequestUseProtocolCachePolicy
+                                  timeoutInterval:60.0];
     
     // create the connection with the request
     // and start loading the data
@@ -53,8 +89,8 @@
     } else {
         NSLog(@"LibraryViewController - refresh: connection failed");
     }
-    return;
     
+    return;
 }
 
 - (void) resolvedCover:(NSNotification *) notification
@@ -71,8 +107,6 @@
         }
         
     }
-    
-    
 }
 
 - (void) downloadedContent:(NSNotification *) notification
@@ -126,6 +160,8 @@
         NSInteger pageHeight = scrollView.frame.size.height;
         NSLog(@"pageWidth=%d, pageHeight=%d", pageWidth, pageHeight);
         
+        // Scrollview background repeat
+        //[scrollView setBackgroundColor:[UIColor colorWithPatternImage: [UIImage imageNamed:@"bg.png"]]];
         
         if (position == 1) // new page situation
         {
@@ -189,7 +225,7 @@
         NSInteger row = 0;
         NSInteger col = 0;
         //const NSInteger w = 320;
-        const NSInteger h = 282;
+        const NSInteger h = 304;
         
         
         if (position > 3) row = 1;
@@ -207,10 +243,12 @@
         // set col position
         switch (col) {
             case  1:
-                col = pageWidth/2 - 140;
+                //col = pageWidth/2 - 140;
+                col = pageWidth/2 - 165;
                 break;
             case  2:
-                col = pageWidth - 300;
+                //col = pageWidth - 300;
+                col = pageWidth - 330;
                 break;
         }
         
@@ -343,12 +381,22 @@
 }
 
 
-
+// Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     [self updateShelf:1];
+    
+    //Library background
+    [[self view] setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"bg"]]];
+    
+    
+    //[[UIBarButtonItem appearance] setBackgroundColor:[UIColor colorWithRed:1.0 green:1.0 blue:1.0 alpha:1.0]];
+    
+    
+    [self updateList];
 }
+
 
 - (void)viewDidUnload
 {
@@ -368,20 +416,22 @@
 - (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation 
                                          duration:(NSTimeInterval)duration
 {
+    [shelfToolBar sizeToFit];
+    //shelfToolBar.frame = CGRectMake(0, 0, shelfToolBar.frame.size.width, shelfToolBar.frame.size.height);
     
     // Update the size/position of some objects
     if (toInterfaceOrientation == UIInterfaceOrientationLandscapeLeft ||
         toInterfaceOrientation == UIInterfaceOrientationLandscapeRight)
     {
-        scrollView.frame = CGRectMake(0, 239, 1024, 785); 
-        shelfToolBar.frame = CGRectMake(0, 0, 1024, 44);
-        shelfTitle.frame = CGRectMake(360, 11, 266, 21);
+        scrollView.frame = CGRectMake(0, 239, 1024, 785);
+		shelfImage.frame = CGRectMake(0, 44, 1024, 195);
+        shelfTitle.frame = CGRectMake(228, 0, shelfTitle.frame.size.width, shelfTitle.frame.size.height);
     }
     else
     {
-        scrollView.frame = CGRectMake(0, 239, 768, 785); 
-        shelfToolBar.frame = CGRectMake(0, 0, 768, 44);
-        shelfTitle.frame = CGRectMake(255, 11, 266, 21);
+        scrollView.frame = CGRectMake(0, 239, 768, 785);
+		shelfImage.frame = CGRectMake(0, 44, 768, 195);
+        shelfTitle.frame = CGRectMake(100, 0, shelfTitle.frame.size.width, shelfTitle.frame.size.height);
     }
     
     
@@ -539,9 +589,6 @@
         } 
     }
     
-    //dealloc number formatter
-    [f dealloc];
-    
     // check if any covers have unresolved pics -> if so, (try to) resolve them
     for (Issue *issue in issuesArray){
         Cover *c =(Cover *)[issue cover];
@@ -563,7 +610,11 @@
         abort();
     }
     
+    [json_issues release];
+    [jsonString release];
     [connection release];
+    //dealloc number formatter
+    [f dealloc];
     [receivedData release];
     return;
 }

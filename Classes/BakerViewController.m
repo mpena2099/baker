@@ -1,24 +1,48 @@
 //
-//  ReaderViewController.m
-//  NavControllerTest
+//  RootViewController.m
+//  Baker
 //
-//  Created by Bart Termorshuizen on 7/24/11.
-//  Copyright 2011 __MyCompanyName__. All rights reserved.
-//
+//  ==========================================================================================
+//  
+//  Copyright (c) 2010-2011, Davide Casali, Marco Colombo, Alessandro Morandi
+//  All rights reserved.
+// 
+//  Changelog
+//  2/18/2012 Andrew Krowczyk @nin9creative - modifications to work with http://github.com/nin9creative/bakershelf
+
+//  Redistribution and use in source and binary forms, with or without modification, are 
+//  permitted provided that the following conditions are met:
+//  
+//  Redistributions of source code must retain the above copyright notice, this list of 
+//  conditions and the following disclaimer.
+//  Redistributions in binary form must reproduce the above copyright notice, this list of 
+//  conditions and the following disclaimer in the documentation and/or other materials 
+//  provided with the distribution.
+//  Neither the name of the Baker Framework nor the names of its contributors may be used to 
+//  endorse or promote products derived from this software without specific prior written 
+//  permission.
+//  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY 
+//  EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES 
+//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
+//  SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, 
+//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+//  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+//  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT 
+//  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+//  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//  
 
 #import <QuartzCore/QuartzCore.h>
 #import <sys/xattr.h>
 
-#import "ReaderViewController.h"
+#import "BakerViewController.h"
 #import "Downloader.h"
 #import "SSZipArchive.h"
-#import "NSDictionary_JSONExtensions.h"
 #import "PageTitleLabel.h"
 #import "Utils.h"
-
-#import "BakerAppDelegate.h"
 #import "Content.h"
-#import "InterceptorWindow.h"
+#import "BakerAppDelegate.h"
+#import "Toolbar.h"
 
 // ALERT LABELS
 #define OPEN_BOOK_MESSAGE       @"Do you want to download "
@@ -42,56 +66,55 @@
 
 // IOS VERSION >= 5.0 MACRO
 #ifndef kCFCoreFoundationVersionNumber_iPhoneOS_5_0
-#define kCFCoreFoundationVersionNumber_iPhoneOS_5_0 675.00
+    #define kCFCoreFoundationVersionNumber_iPhoneOS_5_0 675.00
 #endif
 #ifndef __IPHONE_5_0
-#define __IPHONE_5_0 50000
+    #define __IPHONE_5_0 50000
 #endif
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_5_0
-#define IF_IOS5_OR_GREATER(...) \
-if (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iPhoneOS_5_0) { \
-__VA_ARGS__ \
-}
+    #define IF_IOS5_OR_GREATER(...) \
+    if (kCFCoreFoundationVersionNumber >= kCFCoreFoundationVersionNumber_iPhoneOS_5_0) { \
+        __VA_ARGS__ \
+    }
 #else
-#define IF_IOS5_OR_GREATER(...)
+    #define IF_IOS5_OR_GREATER(...)
 #endif
 
-@implementation ReaderViewController
-//@synthesize pageControl;
-//@synthesize thumbnailControl;
-@synthesize button;
-@synthesize issue;
+@implementation BakerViewController
 
 #pragma mark - SYNTHESIS
 @synthesize scrollView;
 @synthesize currPage;
 @synthesize currentPageNumber;
-
-
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
-    }
-    return self;
-}
+@synthesize pages;
+@synthesize objIssue;
 
 #pragma mark - INIT
 - (id)init {
     self = [super initWithNibName:nil bundle:nil];
     if (self) {
-        NSLog(@"• INIT");
+        NSLog(@"• INIT - Blank Should not be called.");
+        // We aren't using a default init, because in most cases we will always be calling init with specific
+        // issue content selected from the BakerShelf
+	}
+	return self;
+}
+
+- (void)initWithMaterial:(Issue *) _objIssue {
+    self = [super initWithNibName:nil bundle:nil];
+    if (self) {
+        NSLog(@"• INIT initWithMaterial");
+
+        orientation = [[UIApplication sharedApplication] statusBarOrientation];
         
-        Content *content=(Content*)[issue content];
-        
-        //[pageControl setDataSource:[[[KGLocalFileDataSource alloc] initWithPath:[content path]] autorelease]];
-        
-        NSLog(@"• Content Path %@", content.path);
+        //test to fix toolbar bug
+        [self hideStatusBar];
         
         // ****** INIT PROPERTIES
         properties = [Properties properties];
         
+        self.objIssue = _objIssue;
+		
         // ****** DEVICE SCREEN BOUNDS
         screenBounds = [[UIScreen mainScreen] bounds];
         NSLog(@"    Device Width: %f", screenBounds.size.width);
@@ -108,8 +131,10 @@ __VA_ARGS__ \
             [[NSFileManager defaultManager] createDirectoryAtPath:cachePath withIntermediateDirectories:YES attributes:nil error:nil];
         }
         
-        bundleBookPath        = content.path; //[[[NSBundle mainBundle] pathForResource:@"book" ofType:nil] retain];
+        bundleBookPath        = [(Content*)[ objIssue content] path];
         documentsBookPath     = [[privateDocsPath stringByAppendingPathComponent:@"book"] retain];
+        
+        NSLog(@"• Loading Issue Content %@",bundleBookPath);
         
         defaultScreeshotsPath = [[cachePath stringByAppendingPathComponent:@"baker-screenshots"] retain];
         [self addSkipBackupAttributeToItemAtPath:defaultScreeshotsPath];
@@ -132,15 +157,30 @@ __VA_ARGS__ \
         
         discardNextStatusBarToggle = NO;
         
-        // ****** LISTENER FOR DOWNLOAD NOTIFICATION
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(downloadBook:) name:@"downloadNotification" object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleDownloadResult:) name:@"handleDownloadResult" object:nil];
         
         [self setPageSize:[self getCurrentInterfaceOrientation]];
-        [self hideStatusBar];
+                
+        //CGRectMake(0, 0, 1024, 44);
+        // ****** TOOLBAR
+        toolbar = [[Toolbar alloc]init];
+        toolbar.barStyle = UIBarStyleDefault;
+        toolbar.tintColor = [UIColor blackColor];
+        toolbar.tag = 0;
+        [toolbar sizeToFit];
+        //toolbar.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin;
+        toolbar.frame = CGRectMake(0, 0, pageWidth, 44);
+        
+        UIBarButtonItem *back = [[[UIBarButtonItem alloc]initWithTitle:@"Back to Library" style:UIBarButtonItemStyleBordered target:self action:@selector(Close)] autorelease];
+        UIBarButtonItem *space = [[[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:self action:nil] autorelease];
+        
+        [toolbar setItems:[NSArray arrayWithObjects:back,space, nil]];
+        
         
         // ****** SCROLLVIEW INIT
-        self.scrollView = [[[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, pageWidth, pageHeight)] autorelease];
+        self.scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, pageWidth, pageHeight)];
+        // This line below gives a "Potential leak of an object allocated on the previous line
+        // It should be ok as we are setting the Class Instance scrollView to a newly allocated UIScrollView
+        // This is being released in the dealloc, so the warning is just flagging a potential leak - it should be ok.
         scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         scrollView.showsHorizontalScrollIndicator = YES;
         scrollView.showsVerticalScrollIndicator = NO;
@@ -149,103 +189,25 @@ __VA_ARGS__ \
         scrollView.delegate = self;
         
         [self.view addSubview:scrollView];
+        [scrollView release];
         
         // ****** INDEX WEBVIEW INIT
         indexViewController = [[IndexViewController alloc] initWithBookBundlePath:bundleBookPath documentsBookPath:documentsBookPath fileName:INDEX_FILE_NAME webViewDelegate:self];
         [self.view addSubview:indexViewController.view];
-        
-        // ******* ADD TOOLBAR
-        UIToolbar *toolbar = [UIToolbar new];
-        toolbar.barStyle = UIBarStyleDefault;
-        toolbar.tintColor = [UIColor blackColor];
-        [toolbar sizeToFit];
-        toolbar.frame = CGRectMake(0, 0, 768, 44);
-
-        // Add buttons to toolbar
-        UIBarButtonItem *systemItem1 = [[UIBarButtonItem alloc] initWithTitle:@"See all issues" 
-                                                                        style:UIBarButtonItemStyleBordered 
-                                                                       target:self 
-                                                                       action:@selector(btnClicked:)];
-        
-        // Use this to put space in between your toolbox buttons
-        UIBarButtonItem *flexItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
-                                                                                  target:nil
-                                                                                  action:nil];
-        
-        // Add buttons to the array
-        NSArray *items = [NSArray arrayWithObjects: flexItem, systemItem1, nil];
-
-        // Add array of buttons to toolbar
-        [toolbar setItems:items animated:NO];
-        [self.view addSubview:toolbar];
-
-        // Release buttons and toolbar
-        [systemItem1 release];
-        [flexItem release];
-        [toolbar release];
-        
+       
         
         // ****** BOOK INIT
-        if ([[NSFileManager defaultManager] fileExistsAtPath:documentsBookPath]) {
-            [self initBook:documentsBookPath];
+        if ([[NSFileManager defaultManager] fileExistsAtPath:bundleBookPath]) {
+            [self initBook:bundleBookPath];
         } else {
-            if ([[NSFileManager defaultManager] fileExistsAtPath:bundleBookPath]) {
-                [self initBook:bundleBookPath];
-            } else {
-                // Do something if there are no books available to show
-            }
+            // Do something if there are no books available to show
         }
 	}
-	return self;
 }
-
-   
-    //Content *content=(Content*)[issue content];
 
 - (void)setupWebView:(UIWebView *)webView {
     NSLog(@"• Setup webView");
     
-    /*
-    UIButton *libraryButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    [libraryButton addTarget:self action:@selector(btnClicked:)
-            forControlEvents:UIControlEventTouchDown];
-    [libraryButton setTitle:@"Library" forState:UIControlStateNormal];
-    libraryButton.frame = CGRectMake(80.0, 210.0, 160.0, 40.0);
-    [webView addSubview:libraryButton];
-     */
-    
-    
-    /*
-    // Create tollbar
-    UIToolbar *toolbar = [UIToolbar new];
-    toolbar.barStyle = UIBarStyleDefault;
-    toolbar.tintColor = [UIColor blackColor];
-    [toolbar sizeToFit];
-    toolbar.frame = CGRectMake(0, 0, 768, 44);
-    
-    // Add buttons
-    UIBarButtonItem *systemItem1 = [[UIBarButtonItem alloc] initWithTitle:@"See all issues" 
-                                                            style:UIBarButtonItemStyleBordered 
-                                                            target:self 
-                                                            action:@selector(btnClicked:)];
-    
-    // Use this to put space in between your toolbox buttons
-    UIBarButtonItem *flexItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
-                                                                              target:nil
-                                                                              action:nil];
-    
-    // Add buttons to the array
-    NSArray *items = [NSArray arrayWithObjects: flexItem, systemItem1, nil];
-    
-    // Release buttons
-    [systemItem1 release];
-    [flexItem release];
-                                 
-    // Add array of buttons to toolbar
-    [toolbar setItems:items animated:NO];
-    [webView addSubview:toolbar];
-    */
-
     webView.delegate = self;
     webView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 	
@@ -259,19 +221,19 @@ __VA_ARGS__ \
         }
     }
 }
-- (void)setPageSize:(NSString *)orientation {
-	NSLog(@"• Set size for orientation: %@", orientation);
-    
+- (void)setPageSize:(NSString *)_orientation {
+	NSLog(@"• Set size for orientation: %@", _orientation);
+	
     pageWidth = screenBounds.size.width;
     pageHeight = screenBounds.size.height;
-	if ([orientation isEqualToString:@"landscape"]) {
+	if ([_orientation isEqualToString:@"landscape"]) {
 		pageWidth = screenBounds.size.height;
 		pageHeight = screenBounds.size.width;
 	}
 }
 - (void)setTappableAreaSize {
     NSLog(@"• Set tappable area size");
-    
+
     int tappableAreaSize = screenBounds.size.width/16;
     if (screenBounds.size.width < 768) {
         tappableAreaSize = screenBounds.size.width/8;
@@ -298,9 +260,9 @@ __VA_ARGS__ \
     }
     
     [self showPageDetails];
-    
+
     scrollView.contentSize = CGSizeMake(pageWidth * totalPages, pageHeight);
-    
+
 	int scrollViewY = 0;
 	if (![UIApplication sharedApplication].statusBarHidden) {
 		scrollViewY = -20;
@@ -346,9 +308,9 @@ __VA_ARGS__ \
         UIActivityIndicatorView *spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
         spinner.backgroundColor = [UIColor clearColor];
         IF_IOS5_OR_GREATER(
-                           spinner.color = foregroundColor;
-                           spinner.alpha = [(NSNumber *)foregroundAlpha floatValue];
-                           );
+            spinner.color = foregroundColor;
+            spinner.alpha = [(NSNumber *)foregroundAlpha floatValue];
+        );
         
         CGRect frame = spinner.frame;
         frame.origin.x = pageWidth * i + (pageWidth - frame.size.width) / 2;
@@ -464,7 +426,10 @@ __VA_ARGS__ \
     [pageDetails removeAllObjects];
     [pages removeAllObjects];
 }
-- (void)initBookProperties:(NSString *)path {        
+- (void)initBookProperties:(NSString *)path {
+    
+    NSLog(@"initBookProperties");  
+    
     NSString *filePath = [path stringByAppendingPathComponent:@"book.json"];
     [properties loadManifest:filePath];
     
@@ -483,14 +448,15 @@ __VA_ARGS__ \
     
     NSString *backgroundPathLandscape = [properties get:@"-baker-background-image-landscape", nil];
     if (backgroundPathLandscape != nil) {
-        backgroundImageLandscape = [[UIImage imageNamed:backgroundPathLandscape] retain];
+        backgroundPathLandscape  = [path stringByAppendingPathComponent:backgroundPathLandscape];
+        backgroundImageLandscape = [[UIImage imageWithContentsOfFile:backgroundPathLandscape] retain];        
     }
     
     NSString *backgroundPathPortrait = [properties get:@"-baker-background-image-portrait", nil];
     if (backgroundPathPortrait != nil) {
-        backgroundImagePortrait = [[UIImage imageNamed:backgroundPathPortrait] retain];
+        backgroundPathPortrait  = [path stringByAppendingPathComponent:backgroundPathPortrait];
+        backgroundImagePortrait = [[UIImage imageWithContentsOfFile:backgroundPathPortrait] retain];
     }
-    
 }
 - (void)initBook:(NSString *)path {
     NSLog(@"• Init Book");
@@ -562,7 +528,7 @@ __VA_ARGS__ \
                 cachedScreenshotsPath = defaultScreeshotsPath;
             }
         }
-        
+    
         [cachedScreenshotsPath retain];
         
         [self initPageDetails];
@@ -620,6 +586,10 @@ __VA_ARGS__ \
 - (BOOL)changePage:(int)page {
     NSLog(@"• Check if page has changed");
     
+    if (toolbar.tag == 1) {
+        [self showToolbar];
+    }
+    
     BOOL pageChanged = NO;
 	
     if (page < 1)
@@ -645,7 +615,7 @@ __VA_ARGS__ \
         [scrollView scrollRectToVisible:[self frameForPage:currentPageNumber] animated:YES];
         
         [self gotoPageDelayer];
-        
+
         pageChanged = YES;
 	}
 	
@@ -694,12 +664,12 @@ __VA_ARGS__ \
                     [self addPageLoading:+1];
                 if (currentPageNumber > 1)
                     [self addPageLoading:-1];
-                
+                            
             } else {
                 
                 int tmpSlot = 0;
                 if (tapNumber == 2) {
-                    
+                
                     // ****** Moved away for 2 pages: RELOAD CURRENT page
                     if (direction < 0) {
                         // ****** Move LEFT <<<
@@ -714,7 +684,7 @@ __VA_ARGS__ \
                         nextPage = prevPage;
                         prevPage = tmpView;
                     }
-                    
+                                        
                     // Adjust pages slot in the stack to reflect the webviews pointer change
                     for (int i = 0; i < [toLoad count]; i++) {
                         tmpSlot =  -1 * [[[toLoad objectAtIndex:i] valueForKey:@"slot"] intValue];
@@ -723,9 +693,9 @@ __VA_ARGS__ \
                     
                     [currPage removeFromSuperview];
                     [self addPageLoading:0];
-                    
+                
                 } else if (tapNumber == 1) {
-                    
+                                    
                     if (direction < 0) {
                         // ****** Move LEFT <<<
                         [prevPage removeFromSuperview];
@@ -765,7 +735,7 @@ __VA_ARGS__ \
                         }
                         [[toLoad objectAtIndex:i] setObject:[NSNumber numberWithInt:tmpSlot] forKey:@"slot"];
                     }
-                    
+                                        
                     // Since we are not loading anything we have to reset the delayer flag
                     currentPageIsDelayingLoading = NO;
                 }
@@ -834,8 +804,8 @@ __VA_ARGS__ \
     }
 }
 - (void)addPageLoading:(int)slot {    
-    NSLog(@"• Add page to the loding queue");
-    
+    NSLog(@"• Add page to the loading queue");
+
     NSArray *objs = [NSArray arrayWithObjects:[NSNumber numberWithInt:slot], [NSNumber numberWithInt:currentPageNumber + slot], nil];
     NSArray *keys = [NSArray arrayWithObjects:@"slot", @"page", nil];
     
@@ -847,7 +817,7 @@ __VA_ARGS__ \
 }
 - (void)handlePageLoading {
     if ([toLoad count] != 0) {
-        
+                
         int slot = [[[toLoad objectAtIndex:0] valueForKey:@"slot"] intValue];
         int page = [[[toLoad objectAtIndex:0] valueForKey:@"page"] intValue];
         
@@ -855,7 +825,7 @@ __VA_ARGS__ \
         
         [toLoad removeObjectAtIndex:0];
         
-        if ([renderingType isEqualToString:@"screenshots"] && ![self checkScreeshotForPage:page andOrientation:[self getCurrentInterfaceOrientation]]) {
+        if ([renderingType isEqualToString:@"screenshots"] && ![self checkScreenshotForPage:page andOrientation:[self getCurrentInterfaceOrientation]]) {
             [self lockPage:YES];
         }
         
@@ -896,7 +866,7 @@ __VA_ARGS__ \
             [nextPage release];
         }
         nextPage = [webView retain];
-        
+    
     } else if (slot == -1) {
         
         if (prevPage) {
@@ -911,14 +881,14 @@ __VA_ARGS__ \
     
     
     ((UIScrollView *)[[webView subviews] objectAtIndex:0]).pagingEnabled = [[properties get:@"-baker-vertical-pagination", nil] boolValue];
-    
+
     [scrollView addSubview:webView];
 	[self loadWebView:webView withPage:page];
 }
 - (BOOL)loadWebView:(UIWebView*)webView withPage:(int)page {
 	
 	NSString *path = [NSString stringWithString:[pages objectAtIndex:page - 1]];
-    
+		
 	if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
 		NSLog(@"• Loading: book/%@", [[NSFileManager defaultManager] displayNameAtPath:path]);
 		[webView loadRequest:[NSURLRequest requestWithURL:[NSURL fileURLWithPath:path]]];
@@ -969,7 +939,7 @@ __VA_ARGS__ \
 
 #pragma mark - WEBVIEW
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
-       
+        
 	// Sent before a web view begins loading content, useful to trigger actions before the WebView.	
 	NSLog(@"• Should webView load the page ?");
     NSURL *url = [request URL];
@@ -1031,8 +1001,7 @@ __VA_ARGS__ \
                         }
                         
                         [self handleAnchor:YES];                        
-                    }
-                    
+                    }                   
                     else if ([webView isEqual:indexViewController.view])
                     {
                         discardNextStatusBarToggle = NO;
@@ -1071,8 +1040,14 @@ __VA_ARGS__ \
                         
                         [self downloadBook:nil];
                     }
-                } 
-                else 
+                }
+                else if ([[url scheme] isEqualToString:@"mailto"])
+                {
+                    NSLog(@"    Link is a mailto address --> open link in Mail");
+                    [[UIApplication sharedApplication] openURL:url];
+                    return NO;
+                }
+                else
                 {
                     NSString *params = [url query];
                     if (params != nil)
@@ -1082,12 +1057,12 @@ __VA_ARGS__ \
                         
                         if (matches > 0) {
                             NSLog(@"    Link contain param \"referrer=Baker\" --> open link in Safari");
-                            [[UIApplication sharedApplication] openURL:[request URL]];
+                            [[UIApplication sharedApplication] openURL:url];
                             return NO;
                         }
                     }
                     
-                    NSLog(@"    Link doesn't contain param \"referrer=Baker\" --> open link in Page");
+                    NSLog(@"    Link doesn't contain param \"referrer=Baker\" --> open link in page");
                     return YES;
                 }
             }
@@ -1096,8 +1071,28 @@ __VA_ARGS__ \
 		return NO;
 	}
 }
-- (void)webViewDidStartLoad:(UIWebView *)webView {
+- (void)webViewDidStartLoad:(UIWebView *)webView {	
     NSLog(@"• Page did start load");
+    UITapGestureRecognizer* tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapGesture:)];
+    tap.numberOfTapsRequired = 2;
+    tap.numberOfTouchesRequired = 1;
+    tap.delegate=self;
+    [webView addGestureRecognizer:tap];
+    [tap release];
+}
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer{
+    return YES;
+}
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer{
+    return YES;
+}
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch{
+    return YES;
+}
+-(IBAction)tapGesture:(id)sender
+{
+    [self toggleStatusBar];
+    NSLog(@"TAP");
 }
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
 	// Sent if a web view failed to load content.
@@ -1134,7 +1129,7 @@ __VA_ARGS__ \
 - (void)webView:(UIWebView *)webView hidden:(BOOL)status animating:(BOOL)animating {
 	
     NSLog(@"• webView hidden: %d animating: %d", status, animating);
-    
+        
     if (animating) {
         
         webView.hidden = NO;
@@ -1151,7 +1146,7 @@ __VA_ARGS__ \
 	}
 }
 - (void)webViewDidAppear:(UIWebView *)webView animating:(BOOL)animating {
-    
+		    
     if ([webView isEqual:currPage]) {
         
         // If is the first time i load something in the currPage web view...
@@ -1175,16 +1170,35 @@ __VA_ARGS__ \
     
     for (int i = 1; i <= totalPages; i++)
     {
-        if ([self checkScreeshotForPage:i andOrientation:@"portrait"]) {
+        if ([self checkScreenshotForPage:i andOrientation:@"portrait"]) {
             [self placeScreenshotForView:nil andPage:i andOrientation:@"portrait"];
         }
-        
-        if ([self checkScreeshotForPage:i andOrientation:@"landscape"]) {
+            
+        if ([self checkScreenshotForPage:i andOrientation:@"landscape"]) {
             [self placeScreenshotForView:nil andPage:i andOrientation:@"landscape"];
         }
     }
 }
-- (BOOL)checkScreeshotForPage:(int)pageNumber andOrientation:(NSString *)interfaceOrientation {
+- (void)removeScreenshots {
+    
+    NSError *error = nil;
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    
+    // For each file in the directory, create full path and delete the file
+    for (NSString *file in [fileManager contentsOfDirectoryAtPath:cachedScreenshotsPath error:&error])
+    {
+        NSString *filePath = [cachedScreenshotsPath stringByAppendingPathComponent:file];
+        NSLog(@"File : %@", filePath);
+        
+        BOOL fileDeleted = [fileManager removeItemAtPath:filePath error:&error];
+        
+        if (fileDeleted != YES || error != nil)
+        {
+            // Deal with the error...
+        }
+    }
+}
+- (BOOL)checkScreenshotForPage:(int)pageNumber andOrientation:(NSString *)interfaceOrientation {
     
     if (![[NSFileManager defaultManager] fileExistsAtPath:cachedScreenshotsPath]) {
         [[NSFileManager defaultManager] createDirectoryAtPath:cachedScreenshotsPath withIntermediateDirectories:YES attributes:nil error:nil];
@@ -1199,7 +1213,7 @@ __VA_ARGS__ \
     BOOL shouldRevealWebView = YES;
     BOOL animating = YES;
     
-    if (![self checkScreeshotForPage:pageNumber andOrientation:interfaceOrientation]) {
+    if (![self checkScreenshotForPage:pageNumber andOrientation:interfaceOrientation]) {
         
         NSLog(@"• Taking screenshot of page %d", pageNumber);
         
@@ -1208,7 +1222,7 @@ __VA_ARGS__ \
         
         if ([interfaceOrientation isEqualToString:[self getCurrentInterfaceOrientation]] && !currentPageHasChanged) {
             
-            UIGraphicsBeginImageContextWithOptions(webView.frame.size, NO, 1.0);
+            UIGraphicsBeginImageContextWithOptions(webView.frame.size, NO, [[UIScreen mainScreen] scale]);
             [webView.layer renderInContext:UIGraphicsGetCurrentContext()];
             screenshot = UIGraphicsGetImageFromCurrentImageContext();
             UIGraphicsEndImageContext();
@@ -1247,11 +1261,11 @@ __VA_ARGS__ \
     }
 }
 - (void)placeScreenshotForView:(UIWebView *)webView andPage:(int)pageNumber andOrientation:(NSString *)interfaceOrientation {
-    
+            
     int i = pageNumber - 1;
     NSString    *screenshotFile = [cachedScreenshotsPath stringByAppendingPathComponent:[NSString stringWithFormat:@"screenshot-%@-%i.jpg", interfaceOrientation, pageNumber]];
     UIImageView *screenshotView = [[UIImageView alloc] initWithImage:[UIImage imageWithContentsOfFile:screenshotFile]];
-    
+ 
     CGSize pageSize = CGSizeMake(screenBounds.size.width, screenBounds.size.height);
     if ([interfaceOrientation isEqualToString:@"landscape"]) {
         pageSize = CGSizeMake(screenBounds.size.height, screenBounds.size.width);
@@ -1289,7 +1303,7 @@ __VA_ARGS__ \
             [self webView:webView hidden:NO animating:NO];
             
         } else if ([interfaceOrientation isEqualToString:[self getCurrentInterfaceOrientation]] && !currentPageHasChanged) {
-            
+        
             screenshotView.hidden = NO;
             screenshotView.alpha = 0.0;
             
@@ -1331,11 +1345,15 @@ __VA_ARGS__ \
             [self performSelector:@selector(toggleStatusBar) withObject:nil];
         }
     }
-    
+
 }
 - (void)userDidScroll:(UITouch *)touch {
 	NSLog(@"• User scroll");
 	[self hideStatusBar];
+    
+    if (toolbar.tag==1) {
+        [self showToolbar];
+    }
 }
 
 #pragma mark - PAGE SCROLLING
@@ -1383,7 +1401,7 @@ __VA_ARGS__ \
 		offset = [NSString stringWithFormat:@"%d", targetOffset];
 		[self scrollPage:currPage to:offset animating:animating];
 	}
-    
+
 }
 - (void)scrollPage:(UIWebView *)webView to:(NSString *)offset animating:(BOOL)animating {
     [self hideStatusBar];
@@ -1413,8 +1431,70 @@ __VA_ARGS__ \
 	}
 }
 
+    
+#pragma mark - CLOSE
+-(void)Close {
+    NSLog(@"BakerViewController - Selected Back to Library Button");	
+	
+    [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:NO];
+    
+    if ([[UIApplication sharedApplication] statusBarOrientation] == UIInterfaceOrientationPortraitUpsideDown || 
+        [[UIApplication sharedApplication] statusBarOrientation] == UIInterfaceOrientationPortrait) {
+        
+        [[UIApplication sharedApplication] setStatusBarOrientation:orientation];
+    }
+
+    UIWindow *window = [[UIWindow alloc]init];
+    
+    BakerAppDelegate *appDelegate = (BakerAppDelegate *)[[UIApplication sharedApplication] delegate];
+    
+    appDelegate.window = window;
+    [window release];
+    
+    UINavigationController* navigationController = [appDelegate navigationController];
+    
+    [UIView beginAnimations:nil context:NULL];
+    [UIView setAnimationDuration: 0.50];
+    
+    //Hook To MainView
+    [UIView setAnimationTransition:UIViewAnimationTransitionCurlUp forView:navigationController.view cache:YES];
+    
+    [navigationController popViewControllerAnimated:NO];    
+    [navigationController setToolbarHidden:YES animated:NO];
+    [navigationController setNavigationBarHidden:YES];
+    
+    
+    [UIView commitAnimations];
+}
+
+#pragma mark - TOOLBAR
+-(void)showToolbar {
+    if (toolbar.tag == 0) {
+        [toolbar sizeToFit];
+        [toolbar setFrame:CGRectMake(toolbar.frame.origin.x, -44, toolbar.frame.size.width, toolbar.frame.size.height)];
+        
+        [UIView beginAnimations:@"addToolbar" context:nil]; {
+            [UIView setAnimationDuration:0.35];
+            [toolbar setFrame:CGRectMake(toolbar.frame.origin.x, screenBounds.origin.y+20, toolbar.frame.size.width, toolbar.frame.size.height)];
+            [self.view addSubview:toolbar];
+        }
+        [UIView commitAnimations];
+        toolbar.tag=1;
+        
+    } else {
+        [UIView beginAnimations:@"removeToolbar" context:nil]; {
+            [UIView setAnimationDuration:0.35];
+			[toolbar setFrame:CGRectMake(toolbar.frame.origin.x, -44, toolbar.frame.size.width, toolbar.frame.size.height)];
+        }
+        [UIView commitAnimations];        
+        toolbar.tag=0;
+    }
+}
+
+
 #pragma mark - STATUS BAR
 - (void)toggleStatusBar {
+    [self showToolbar];
 	if (discardNextStatusBarToggle) {
 		// do nothing, but reset the variable
 		discardNextStatusBarToggle = NO;
@@ -1432,6 +1512,10 @@ __VA_ARGS__ \
 	[self hideStatusBarDiscardingToggle:NO];
 }
 - (void)hideStatusBarDiscardingToggle:(BOOL)discardToggle {
+    if (toolbar.tag == 1) {
+       [self showToolbar];
+    }
+
 	NSLog(@"• Hide status bar %@", (discardToggle ? @"discarding toggle" : @""));
 	discardNextStatusBarToggle = discardToggle;
 	[[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
@@ -1481,7 +1565,7 @@ __VA_ARGS__ \
 	
 	NSDictionary *requestSummary = [NSDictionary dictionaryWithDictionary:(NSMutableDictionary *)[notification object]];	
 	[downloader release];
-    
+		
 	if ([requestSummary objectForKey:@"error"] != nil) {
 		
 		NSLog(@"• Error while downloading new book data");
@@ -1492,7 +1576,7 @@ __VA_ARGS__ \
 										 otherButtonTitles:ERROR_FEEDBACK_CONFIRM, nil];
 		[feedbackAlert show];
 		[feedbackAlert release];
-        
+			
 	} else if ([requestSummary objectForKey:@"data"] != nil) {
 		
 		NSLog(@"• New book data received succesfully");
@@ -1501,7 +1585,7 @@ __VA_ARGS__ \
 												  delegate:self
 										 cancelButtonTitle:nil
 										 otherButtonTitles:nil];
-        
+				
 		UIActivityIndicatorView *extractingWheel = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(124,50,37,37)];
 		extractingWheel.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhiteLarge;
 		[extractingWheel startAnimating];
@@ -1516,12 +1600,12 @@ __VA_ARGS__ \
 	}
 }
 - (void)manageDownloadData:(NSData *)data {
-    
+			
 	NSArray *URLSections = [NSArray arrayWithArray:[URLDownload pathComponents]];
 	NSString *targetPath = [NSTemporaryDirectory() stringByAppendingString:[URLSections lastObject]];
-    
+		
 	[data writeToFile:targetPath atomically:YES];
-    
+			
 	if ([[NSFileManager defaultManager] fileExistsAtPath:targetPath]) {
 		NSLog(@"• File hpub create successfully at path: %@", targetPath);
 		NSLog(@"    Book destination path: %@", documentsBookPath);
@@ -1530,12 +1614,12 @@ __VA_ARGS__ \
 		if ([[NSFileManager defaultManager] fileExistsAtPath:documentsBookPath]) {
 			[[NSFileManager defaultManager] removeItemAtPath:documentsBookPath error:NULL];
         }
-        
+    
 		[SSZipArchive unzipFileAtPath:targetPath toDestination:documentsBookPath];
 		
         NSLog(@"    Book successfully unzipped. Removing .hpub file");
         [[NSFileManager defaultManager] removeItemAtPath:targetPath error:NULL];
-        
+				
 		NSLog(@"    Add skip backup attribute to book folder");
         [self addSkipBackupAttributeToItemAtPath:documentsBookPath];
         
@@ -1561,18 +1645,120 @@ __VA_ARGS__ \
 	}
 }
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-	// Overriden to allow any orientation.
-	if ([availableOrientation isEqualToString:@"portrait"]) {
-		return (interfaceOrientation == UIInterfaceOrientationPortrait || interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown);
-	} else if ([availableOrientation isEqualToString:@"landscape"]) {
-		return (interfaceOrientation == UIInterfaceOrientationLandscapeRight || interfaceOrientation == UIInterfaceOrientationLandscapeLeft);
-	} else {
-		return YES;
-	}	
+    
+    if ([availableOrientation isEqualToString:@"portrait"]){
+        
+        if(interfaceOrientation == UIInterfaceOrientationPortrait){
+            UIApplication *application = [UIApplication sharedApplication];    
+            
+            [application setStatusBarOrientation: UIInterfaceOrientationPortrait animated:NO];
+            
+            return YES;
+        }
+        else if(interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown){
+            
+            UIApplication *application = [UIApplication sharedApplication];    
+            
+            [application setStatusBarOrientation: UIInterfaceOrientationPortraitUpsideDown animated:NO];
+            
+            return YES;
+        }
+        else if(interfaceOrientation == UIInterfaceOrientationLandscapeRight){
+            
+            //UIApplication *application = [UIApplication sharedApplication];    
+            
+            //[application setStatusBarOrientation: UIInterfaceOrientationPortrait animated:NO];
+            
+            return NO;
+        }
+        else if(interfaceOrientation == UIInterfaceOrientationLandscapeLeft){
+            
+            //UIApplication *application = [UIApplication sharedApplication];    
+            
+            //[application setStatusBarOrientation: UIInterfaceOrientationPortrait animated:NO];
+            
+            return NO;
+        }
+        return NO;
+    } 
+    
+    else if ([availableOrientation isEqualToString:@"landscape"]){
+        
+        if(interfaceOrientation == UIInterfaceOrientationLandscapeRight){
+            
+            UIApplication *application = [UIApplication sharedApplication];    
+            
+            [application setStatusBarOrientation: UIInterfaceOrientationLandscapeRight animated:NO];
+            
+            [self setPageSize:[self getCurrentInterfaceOrientation]];
+            [self getPageHeight];    
+            [self resetScrollView];
+            [currPage setNeedsDisplay];
+            [currPage stringByEvaluatingJavaScriptFromString:@"var e = document.createEvent('Events'); e.initEvent('orientationchange', true, false); document.dispatchEvent(e);"];
+            
+            return YES;
+        }
+        else if(interfaceOrientation == UIInterfaceOrientationLandscapeLeft){
+            UIApplication *application = [UIApplication sharedApplication];    
+            
+            [application setStatusBarOrientation: UIInterfaceOrientationLandscapeLeft animated:NO];
+            
+            [self setPageSize:[self getCurrentInterfaceOrientation]];
+            [self getPageHeight];    
+            [self resetScrollView];
+            [currPage setNeedsDisplay];
+            [currPage stringByEvaluatingJavaScriptFromString:@"var e = document.createEvent('Events'); e.initEvent('orientationchange', true, false); document.dispatchEvent(e);"];
+            
+            return YES;
+        }
+        else if(interfaceOrientation == UIInterfaceOrientationPortrait){
+            //UIApplication *application = [UIApplication sharedApplication];    
+            //[application setStatusBarOrientation: UIInterfaceOrientationLandscapeLeft animated:NO];
+            return NO;   
+        }
+        else if(interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown){
+            //UIApplication *application = [UIApplication sharedApplication];    
+            //[application setStatusBarOrientation: UIInterfaceOrientationLandscapeRight animated:NO];
+            return NO;
+        }
+        
+        return NO;
+        
+    }else if([availableOrientation isEqualToString:@"both"]){
+        if(interfaceOrientation == UIInterfaceOrientationLandscapeRight){
+            UIApplication *application = [UIApplication sharedApplication];    
+            [application setStatusBarOrientation: UIInterfaceOrientationLandscapeRight animated:NO];
+        }
+        else if(interfaceOrientation == UIInterfaceOrientationLandscapeLeft){
+            UIApplication *application = [UIApplication sharedApplication];
+            [application setStatusBarOrientation: UIInterfaceOrientationLandscapeLeft animated:NO];
+        }
+        else if(interfaceOrientation == UIInterfaceOrientationPortrait){
+            UIApplication *application = [UIApplication sharedApplication];    
+            [application setStatusBarOrientation: UIInterfaceOrientationPortrait animated:NO];
+        }
+        else if(interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown){
+            UIApplication *application = [UIApplication sharedApplication];    
+            [application setStatusBarOrientation: UIInterfaceOrientationPortraitUpsideDown animated:NO];
+        }
+        
+        [self setPageSize:[self getCurrentInterfaceOrientation]];
+        [self getPageHeight];    
+        [self resetScrollView];
+        [currPage setNeedsDisplay];
+        [currPage stringByEvaluatingJavaScriptFromString:@"var e = document.createEvent('Events'); e.initEvent('orientationchange', true, false); document.dispatchEvent(e);"];
+        
+        return YES;
+        
+    }
+    return NO;
 }
 - (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
     // Notify the index view
     [indexViewController willRotate];
+    
+    //test to fix toolbar bug
+    [self hideStatusBar];
     
     // Since the UIWebView doesn't handle orientationchange events correctly we have to do handle them ourselves 
     // 1. Set the correct value for window.orientation property
@@ -1603,13 +1789,18 @@ __VA_ARGS__ \
     // 3. Merge the scripts and load them on the current UIWebView
     NSString *jsCommand = [jsOrientationGetter stringByAppendingString:jsOrientationChange];
     [currPage stringByEvaluatingJavaScriptFromString:jsCommand];
+
 }
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
+    
     [indexViewController rotateFromOrientation:fromInterfaceOrientation toOrientation:self.interfaceOrientation];
     
     [self setPageSize:[self getCurrentInterfaceOrientation]];
     [self getPageHeight];    
 	[self resetScrollView];
+    [currPage setNeedsDisplay];
+	[currPage stringByEvaluatingJavaScriptFromString:@"var e = document.createEvent('Events'); e.initEvent('orientationchange', true, false); document.dispatchEvent(e);"];
+    
 }
 
 #pragma mark - MEMORY
@@ -1627,59 +1818,47 @@ __VA_ARGS__ \
 	nextPage.delegate = nil;
 	prevPage.delegate = nil;
 }
-
 - (void)dealloc {
+    
+    NSLog(@"BakerViewController - dealloc");  
+    
+    //Delete files from cached screenshot page (messes with multiple issues)
+    [self removeScreenshots];
     
     [cachedScreenshotsPath release];
     [defaultScreeshotsPath release];
-    
-    [documentsBookPath release];
-    [bundleBookPath release];
-    
+
     [pageDetails release];
     [toLoad release];
     [pages release];
     
     [indexViewController release];
+
+    for(UIView *view in scrollView.subviews)
+    {
+        if([view isKindOfClass:[UIWebView class]])
+        {
+            for(UIView *subview in view.subviews)
+            {
+                [subview removeFromSuperview];
+            }
+        }
+        [view removeFromSuperview];
+    }
+    
     [scrollView release];
+    
     [currPage release];
 	[nextPage release];
 	[prevPage release];
     
+    [objIssue release];
+    
+    for(UIView *view in self.view.subviews)
+    {
+        [view removeFromSuperview];
+    }
+    
     [super dealloc];
 }
-
-
--(IBAction) btnClicked:(id) sender {
-    NSLog(@"button clicked");
-    
-    BakerAppDelegate *appDelegate = (BakerAppDelegate *)[[UIApplication sharedApplication] delegate];
-    //UINavigationController* navigationController = [appDelegate navigationController];
-    
-    //[UIView beginAnimations:nil context:NULL];
-    //[UIView setAnimationDuration: 0.50];
-    
-    //Hook To MainView
-    //[UIView setAnimationTransition:UIViewAnimationTransitionFlipFromRight forView:navigationController.view cache:YES];
-    
-    //avigationController popViewControllerAnimated:NO];    
-    //[navigationController setToolbarHidden:NO animated:NO];
-    
-    
-    //[UIView commitAnimations];
-    self.scrollView.delegate = nil;
-    
-    [self.view removeFromSuperview];
-    
-    [appDelegate reloadShelf];
-    
-    //appDelegate.window = nil;
-    
-    //appDelegate.window =[[[InterceptorWindow alloc] initWithTarget:rvc.scrollView eventsDelegate:rvc frame:[[UIScreen mainScreen]bounds]] autorelease];
-    //appDelegate.window.backgroundColor = [UIColor whiteColor];
-    //[appDelegate.window addSubview:rvc.view];
-    //[appDelegate.window makeKeyAndVisible];
-    
-}
-
 @end

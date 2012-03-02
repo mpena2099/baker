@@ -31,10 +31,8 @@
 
 
 #import "BakerAppDelegate.h"
-//#import "RootViewController.h"
-#import "InterceptorWindow.h"
 #import "LibraryViewController.h"
-#import "ReaderViewController.h"
+#import "BakerViewController.h"
 #import "Issue.h"
 #import "Cover.h"
 #import "Content.h"
@@ -42,10 +40,8 @@
 @implementation BakerAppDelegate
 
 @synthesize window;
-//@synthesize rootViewController;
 
 @synthesize navigationController = _navigationController;
-@synthesize rvc=_rvc;
 
 @synthesize managedObjectContext=__managedObjectContext;
 @synthesize managedObjectModel=__managedObjectModel;
@@ -66,11 +62,14 @@
     
     // Shelf View
     LibraryViewController * LVrootViewController = [[LibraryViewController alloc] initWithNibName:@"LibraryViewController" bundle:nil];  
-    _rvc = [[ReaderViewController alloc] init];
     
     _navigationController = [[UINavigationController alloc] initWithRootViewController:LVrootViewController];  
     [_navigationController setNavigationBarHidden:YES];
-    //[_navigationController setToolbarHidden:NO];      // Disabled
+    [_navigationController setToolbarHidden:YES];
+    
+    // Can Release this as it's being retained in the _navigationController
+    [LVrootViewController release];
+    
     
     self.window.rootViewController = _navigationController;
     [self.window makeKeyAndVisible];
@@ -85,23 +84,6 @@
 	return YES;
 }
 
-- (void)reloadShelf {
-    
-    //self.window = nil;
-	
-    // Shelf View
-    LibraryViewController * LVrootViewController = [[LibraryViewController alloc] initWithNibName:@"LibraryViewController" bundle:nil];  
-    _rvc = [[ReaderViewController alloc] init];
-    //[_rvc.pageControl hideUntilInitialised:3];
-    
-    _navigationController = [[UINavigationController alloc] initWithRootViewController:LVrootViewController];  
-    [_navigationController setNavigationBarHidden:YES];
-    //[_navigationController setToolbarHidden:NO];      // Disabled
-    
-    self.window.rootViewController = _navigationController;
-    [self.window makeKeyAndVisible];
-
-}
 
 - (BOOL)application:(UIApplication*)application handleOpenURL:(NSURL*)url {
 	
@@ -149,8 +131,10 @@
 }
 
 - (void)saveLastPageReference {
+    
+    //@nin9creative - need to figure out how to reimplement saving pages with multiple issues?
 	
-	NSUserDefaults *userDefs = [NSUserDefaults standardUserDefaults];
+	//NSUserDefaults *userDefs = [NSUserDefaults standardUserDefaults];
 	
 	// Save last page viewed reference
 	//if (rootViewController.currentPageNumber > 0) {
@@ -175,8 +159,7 @@
      */
 }
 - (void)dealloc {
-    
-	//[rootViewController release];
+
 	[window release];
     [__managedObjectContext release];
     [__managedObjectModel release];
@@ -187,6 +170,7 @@
 
 - (void)awakeFromNib
 {
+
     /*
      Typically you should set up the Core Data stack here, usually by passing the managed object context to the first view controller.
      self.<#View controller#>.managedObjectContext = self.managedObjectContext;

@@ -1,23 +1,47 @@
 //
-//  ReaderViewController.h
-//  NavControllerTest
+//  RootViewController.h
+//  Baker
 //
-//  Created by Bart Termorshuizen on 7/24/11.
-//  Copyright 2011 __MyCompanyName__. All rights reserved.
-//
+//  ==========================================================================================
+//  
+//  Copyright (c) 2010-2011, Davide Casali, Marco Colombo, Alessandro Morandi
+//  All rights reserved.
+//  
+//  Redistribution and use in source and binary forms, with or without modification, are 
+//  permitted provided that the following conditions are met:
+//  
+//  Redistributions of source code must retain the above copyright notice, this list of 
+//  conditions and the following disclaimer.
+//  Redistributions in binary form must reproduce the above copyright notice, this list of 
+//  conditions and the following disclaimer in the documentation and/or other materials 
+//  provided with the distribution.
+//  Neither the name of the Baker Framework nor the names of its contributors may be used to 
+//  endorse or promote products derived from this software without specific prior written 
+//  permission.
+//  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY 
+//  EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES 
+//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
+//  SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, 
+//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+//  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+//  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT 
+//  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+//  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//  
 
-//#import "Pugpig/Pugpig.h"
-#import "Issue.h"
+
+#import <UIKit/UIKit.h>
 #import "IndexViewController.h"
 #import "Properties.h"
-
+#import "Issue.h"
 
 @class Downloader;
 
-@interface ReaderViewController : UIViewController < UIWebViewDelegate, UIScrollViewDelegate >{
-    Issue* issue;
+@interface BakerViewController : UIViewController <UIWebViewDelegate, UIScrollViewDelegate, UIPopoverControllerDelegate,UIGestureRecognizerDelegate> {
+	
+	CGRect screenBounds;
     
-    CGRect screenBounds;
+    Issue* objIssue;
 	
 	NSString *documentsBookPath;
     NSString *bundleBookPath;
@@ -32,7 +56,7 @@
     NSMutableArray *pageDetails;
     UIImage *backgroundImageLandscape;
     UIImage *backgroundImagePortrait;
-    
+
 	NSString *pageNameFromURL;
 	NSString *anchorFromURL;
 	
@@ -55,7 +79,7 @@
 	CGRect downTapArea;
 	CGRect leftTapArea;
 	CGRect rightTapArea;
-    
+
 	int totalPages;
     int lastPageNumber;
 	int currentPageNumber;
@@ -72,19 +96,22 @@
     
     Properties *properties;
     
+    UIInterfaceOrientation orientation;
+      
+    UIToolbar *toolbar;
 }
-
-//@property (nonatomic, retain) IBOutlet KGPagedDocControl *pageControl;
-//@property (nonatomic, retain) IBOutlet KGPagedDocThumbnailControl *thumbnailControl;
-@property (nonatomic, retain) IBOutlet UIButton* button;
-@property (nonatomic, retain) Issue* issue;
 
 #pragma mark - PROPERTIES
 @property (nonatomic, retain) UIScrollView *scrollView;
 @property (nonatomic, retain) UIWebView *currPage;
+@property (nonatomic, retain) NSMutableArray *pages;
+@property (nonatomic, retain) Issue* objIssue;
 @property int currentPageNumber;
 
+-(IBAction)tapGesture:(id)sender;
+
 #pragma mark - INIT
+- (void)initWithMaterial:(Issue *) _objIssue;
 - (void)setupWebView:(UIWebView *)webView;
 - (void)setPageSize:(NSString *)orientation;
 - (void)setTappableAreaSize;
@@ -117,7 +144,8 @@
 
 #pragma mark - SCREENSHOTS
 - (void)initScreenshots;
-- (BOOL)checkScreeshotForPage:(int)pageNumber andOrientation:(NSString *)interfaceOrientation;
+- (void)removeScreenshots;
+- (BOOL)checkScreenshotForPage:(int)pageNumber andOrientation:(NSString *)interfaceOrientation;
 - (void)takeScreenshotFromView:(UIWebView *)webView forPage:(int)pageNumber andOrientation:(NSString *)interfaceOrientation;
 - (void)placeScreenshotForView:(UIWebView *)webView andPage:(int)pageNumber andOrientation:(NSString *)interfaceOrientation;
 
@@ -132,6 +160,12 @@
 - (void)scrollPage:(UIWebView *)webView to:(NSString *)offset animating:(BOOL)animating;
 - (void)handleAnchor:(BOOL)animating;
 
+#pragma mark - Close
+-(void)Close;
+
+#pragma mark - TOOLBAR
+-(void)showToolbar;
+
 #pragma mark - STATUS BAR
 - (void)toggleStatusBar;
 - (void)hideStatusBar;
@@ -145,10 +179,5 @@
 
 #pragma mark - ORIENTATION
 - (NSString *)getCurrentInterfaceOrientation;
--(IBAction) btnClicked:(id) sender;
-
 
 @end
-
-
-

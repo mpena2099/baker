@@ -1,12 +1,9 @@
 //
-//  InterceptorWindowTests.m
+//  Toolbar.m
 //  Baker
 //
-//  ==========================================================================================
-//  
-//  Copyright (c) 2010-2011, Davide Casali, Marco Colombo, Alessandro Morandi
-//  All rights reserved.
-//  
+//  Created by Heberti Almeida on 26/02/12.
+//
 //  Redistribution and use in source and binary forms, with or without modification, are 
 //  permitted provided that the following conditions are met:
 //  
@@ -15,7 +12,7 @@
 //  Redistributions in binary form must reproduce the above copyright notice, this list of 
 //  conditions and the following disclaimer in the documentation and/or other materials 
 //  provided with the distribution.
-//  Neither the name of the <ORGANIZATION> nor the names of its contributors may be used to 
+//  Neither the name of the Baker Framework nor the names of its contributors may be used to 
 //  endorse or promote products derived from this software without specific prior written 
 //  permission.
 //  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY 
@@ -29,30 +26,31 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // 
 
-#import <OCMock/OCMock.h>
-#import "InterceptorWindowTests.h"
-#import "InterceptorWindow.h"
+#import "Toolbar.h"
 
-@implementation InterceptorWindowTests
+@implementation Toolbar
 
-- (void) testInitInterceptorWindow {
-	UIWindow *iWindow = [[InterceptorWindow alloc] initWithFrame:CGRectMake(0,0,100,100)];
-	STAssertNotNil(iWindow, @"Failed to initialize InterceptorWindow");
+/*
+- (id)initWithFrame:(CGRect)frame
+{
+    self = [super initWithFrame:frame];
+    if (self) {
+        // Initialization code
+        CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
+    }
+    return self;
+}
+*/
+
+
+// Only override drawRect: if you perform custom drawing.
+// An empty implementation adversely affects performance during animation.
+- (void) drawRect:(CGRect)rect
+{
+    // Drawing code    
+    UIImage *image = [UIImage imageNamed:@"toolbar"];
+    [image drawAsPatternInRect:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height)];
 }
 
-- (void)testReturnsStubbedReturnValue {
-    id returnValue;
-    
-    id mock = [OCMockObject mockForClass:[UIViewController class]];
-    [[[mock stub] andReturn:@"megamock"] title];
-    returnValue = [mock title];
-    
-    STAssertEqualObjects(@"megamock", returnValue, @"Should have returned stubbed value.");
-}
-
-// Uncomment this to force a failure
-//- (void) testFail {
-//	STFail(@"Must fail to succeed");
-//}
 
 @end

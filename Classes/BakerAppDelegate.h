@@ -32,22 +32,18 @@
 
 #import <UIKit/UIKit.h>
 @class LibraryViewController;
-@class ReaderViewController;
-@class RootViewController;
+@class BakerViewController;
 
 @interface BakerAppDelegate : NSObject <UIApplicationDelegate> {
     
 	UIWindow *window;
-	//RootViewController *rootViewController;
     IBOutlet LibraryViewController *libraryViewController;
     
 }
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;
-//@property (nonatomic, retain) RootViewController *rootViewController;
 
 @property (nonatomic, retain) IBOutlet UINavigationController *navigationController;
-@property (nonatomic, retain) ReaderViewController *rvc;
 
 @property (nonatomic, retain, readonly) NSManagedObjectContext *managedObjectContext;
 @property (nonatomic, retain, readonly) NSManagedObjectModel *managedObjectModel;
@@ -55,7 +51,6 @@
 
 - (void)saveLastPageReference;
 - (void)saveContext;
-- (void)reloadShelf;
 - (NSURL *)applicationDocumentsDirectory;
 
 @end
