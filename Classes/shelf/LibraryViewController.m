@@ -512,7 +512,7 @@
     
     
     // shared NKLibrary instance
-    //NKLibrary *nkLib = [NKLibrary sharedLibrary];
+    NKLibrary *nkLib = [NKLibrary sharedLibrary];
     
     
     for (NSDictionary *json_issue in json_issues) {
@@ -561,7 +561,7 @@
             NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
             [dateFormatter setDateFormat:@"yyyy-MM-dd"];
             [newIssue setDate:[dateFormatter dateFromString:date]];
-            [dateFormatter dealloc];
+            //[dateFormatter dealloc];
             
             //set title, descr
             [newIssue setTitle:title];
@@ -596,21 +596,31 @@
             
             [ivc release];
             
-            /*
+            
             // Add new issue to to Newsstand                // <---------------------
             NKIssue *nkIssue = [nkLib issueWithName:number];
             if (!nkIssue) {
-                nkIssue = [nkLib addIssueWithName:number date:[dateFormatter dateFromString:date];
+                nkIssue = [nkLib addIssueWithName:number date:[dateFormatter dateFromString:date]];
+                NSLog(@"number: %@", number);
             }
              
             [nkIssue release]; 
-            */
+            [dateFormatter dealloc];
+          
             
+            
+            
+            // Newsstand Background downloading
+            //NKLibrary *nkLib = [NKLibrary sharedLibrary];
+            for (NKAssetDownload *asset in [nkLib downloadingAssets]) {
+                [asset downloadWithDelegate:newContent];
+            }
+
         } 
     }
     
     
-    //[nkLib release];
+    [nkLib release];
     
     
     // check if any covers have unresolved pics -> if so, (try to) resolve them

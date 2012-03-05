@@ -27,13 +27,17 @@
 // 
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
+#import <NewsstandKit/NewsstandKit.h>
 
 @class Issue;
 
-@interface Content : NSManagedObject {
+@interface Content : NSManagedObject <NSURLConnectionDownloadDelegate> {
     NSMutableData * receivedData;
     NSNumber *filesize;
     UIProgressView *progressViewC;
+    
+    NKLibrary *nkLib;
+    NKIssue *nkIssue;
 
 @private
 }
@@ -41,13 +45,13 @@
 @property (nonatomic, retain) NSString * url;
 @property (nonatomic, retain) Issue * issue;
 
-
-//-(void)resolve;
 - (void)resolve:(UIProgressView *) progressViewC;
-
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response;
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data;
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error;
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection;
+
+-(void)updateProgressOfConnection:(NSURLConnection *)connection withTotalBytesWritten:(long long)totalBytesWritten expectedTotalBytes:(long long)expectedTotalBytes;
+-(void)connectionDidFinishDownloading:(NSURLConnection *)connection destinationURL:(NSURL *)destinationURL;
 
 @end

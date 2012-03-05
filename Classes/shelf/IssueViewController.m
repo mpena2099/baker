@@ -229,7 +229,7 @@
               UIImage *img = [[UIImage alloc] initWithContentsOfFile:[(Cover *)[issue cover] path]];
 
               if (img) {
-                  [[UIApplication sharedApplication] setNewsstandIconImage:img];
+                [[UIApplication sharedApplication] setNewsstandIconImage:img];
                 [[UIApplication sharedApplication] setApplicationIconBadgeNumber:1];
               }
                 [img release];

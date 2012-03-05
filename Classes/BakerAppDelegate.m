@@ -47,6 +47,7 @@
 @synthesize managedObjectModel=__managedObjectModel;
 @synthesize persistentStoreCoordinator=__persistentStoreCoordinator;
 
+
 #pragma mark -
 #pragma mark Application lifecycle
 
@@ -81,6 +82,18 @@
 		[self application:application handleOpenURL:url];
 	}
 	
+    
+    /*
+    // Newsstand Background downloading
+     Content *newContent = (Content *)[NSEntityDescription insertNewObjectForEntityForName:@"Content" inManagedObjectContext:managedObjectContext];
+
+    NKLibrary *nkLib = [NKLibrary sharedLibrary];
+    for (NKAssetDownload *asset in [nkLib downloadingAssets]) {
+        [asset downloadWithDelegate:LVrootViewController];
+    }
+     */
+    
+    
 	return YES;
 }
 

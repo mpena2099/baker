@@ -26,7 +26,7 @@
 //  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // 
 #import <UIKit/UIKit.h>
-//#import <NewsstandKit/NewsstandKit.h>
+#import <NewsstandKit/NewsstandKit.h>
 
 @class IssueViewController;
 
