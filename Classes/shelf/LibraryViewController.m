@@ -34,6 +34,7 @@
 #include "Content.h"
 
 #import "JSON.h"
+#import "ReceiptCheck.h"
 
 
 @implementation LibraryViewController
@@ -43,6 +44,9 @@
 @synthesize numberOfIssuesShown;
 @synthesize numberOfPagesShown;
 
+@synthesize purchasing=purchasing_;
+
+
 
 //Sync button
 -(IBAction) sync:(id) sender
@@ -50,14 +54,125 @@
     [self updateList];
 }
 
-//Subscribe button
--(IBAction) subscribe:(id) sender
+
+// "free subscription" button callback
+-(IBAction) freeSubscription:(id) sender
 {
-    NSLog(@"Subscribe button pushed");
-	UIAlertView *someError = [[UIAlertView alloc] initWithTitle: @"Subscribe to Magazine" message: @"Subscription action!" delegate: self cancelButtonTitle: @"Ok" otherButtonTitles: nil];
-	
-	[someError show];
-	[someError release];
+    NSLog(@"freeSubscription button pushed");
+    
+    [self subscription:@"CanaMix_Assinatura_Gratuita"];     // <--------------------------
+}
+
+
+- (IBAction)subscription:(NSString *)productId {
+    if (purchasing_ == YES) {
+        return;
+    }
+    purchasing_ = YES;
+    
+    // product request
+    SKProductsRequest *productsRequest = [[SKProductsRequest alloc] initWithProductIdentifiers:[NSSet setWithObject:productId]];
+    productsRequest.delegate = self;
+    [productsRequest start];
+}
+
+
+-(void)productsRequest:(SKProductsRequest *)request didReceiveResponse:(SKProductsResponse *)response {
+    NSLog(@"Request: %@ -- Response: %@",request,response);
+    NSLog(@"Products: %@",response.products);
+    for(SKProduct *product in response.products) {
+        SKPayment *payment = [SKPayment paymentWithProduct:product];
+        [[SKPaymentQueue defaultQueue] addPayment:payment];
+    }
+}
+
+
+-(void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray *)transactions {
+    for(SKPaymentTransaction *transaction in transactions) {
+        NSLog(@"Updated transaction %@",transaction);
+        switch (transaction.transactionState) {
+            case SKPaymentTransactionStateFailed:
+                [self errorWithTransaction:transaction];
+                break;
+            case SKPaymentTransactionStatePurchasing:
+                NSLog(@"Purchasing...");
+                break;
+            case SKPaymentTransactionStatePurchased:
+            case SKPaymentTransactionStateRestored:
+                [self finishedTransaction:transaction];
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+
+-(void)errorWithTransaction:(SKPaymentTransaction *)transaction {
+    [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Subscription failure"
+                                                    message:[transaction.error localizedDescription]
+                                                   delegate:nil
+                                          cancelButtonTitle:@"Close"
+                                          otherButtonTitles:nil];
+    [alert show];
+    [alert release];
+}
+
+
+-(void)finishedTransaction:(SKPaymentTransaction *)transaction {
+    NSLog(@"Finished transaction");
+    [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
+    /*
+     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Subscription done"
+     message:[NSString stringWithFormat:@"Receipt to be sent: %@\nTransaction ID: %@",transaction.transactionReceipt,transaction.transactionIdentifier]
+     delegate:nil
+     cancelButtonTitle:@"Close"
+     otherButtonTitles:nil];
+     [alert show];
+     [alert release];
+     */
+    // save receipt
+    [[NSUserDefaults standardUserDefaults] setObject:transaction.transactionIdentifier forKey:@"receipt"];
+    // check receipt
+    [self checkReceipt:transaction.transactionReceipt];
+}
+
+
+-(void)checkReceipt:(NSData *)receipt {
+    /*
+    // save receipt
+    NSString *receiptStorageFile = [DocumentsDirectory stringByAppendingPathComponent:@"receipts.plist"];
+    NSMutableArray *receiptStorage = [[NSMutableArray alloc] initWithContentsOfFile:receiptStorageFile];
+    if(!receiptStorage) {
+        receiptStorage = [[NSMutableArray alloc] init];
+    }
+    [receiptStorage addObject:receipt];
+    [receiptStorage writeToFile:receiptStorageFile atomically:YES];
+    [receiptStorage release];
+    [ReceiptCheck validateReceiptWithData:receipt completionHandler:^(BOOL success,NSString *answer){
+        if(success==YES) {
+            NSLog(@"Receipt has been validated: %@",answer);
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Purchase OK" message:nil delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
+            [alert show];
+            [alert release];
+        } else {
+            NSLog(@"Receipt not validated! Error: %@",answer);
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Purchase Error" message:@"Cannot validate receipt" delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
+            [alert show];
+            [alert release];
+        };
+    }];
+    */
+    ReceiptCheck *checker = [ReceiptCheck validateReceiptWithData:receipt completionHandler:^(BOOL success,NSString *answer){
+        if(success==YES) {
+            NSLog(@"Receipt has been validated: %@",answer);
+        } else {
+            NSLog(@"Receipt not validated! Error: %@",answer);
+        };
+        [checker release];
+    }];
+    [checker retain];
 }
 
 
@@ -606,16 +721,6 @@
              
             [nkIssue release]; 
             [dateFormatter dealloc];
-          
-            
-            
-            
-            // Newsstand Background downloading
-            //NKLibrary *nkLib = [NKLibrary sharedLibrary];
-            for (NKAssetDownload *asset in [nkLib downloadingAssets]) {
-                [asset downloadWithDelegate:newContent];
-            }
-
         } 
     }
     

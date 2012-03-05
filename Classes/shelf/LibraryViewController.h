@@ -27,11 +27,12 @@
 // 
 #import <UIKit/UIKit.h>
 #import <NewsstandKit/NewsstandKit.h>
+#import <StoreKit/StoreKit.h>
 
 @class IssueViewController;
 
 
-@interface LibraryViewController : UIViewController {
+@interface LibraryViewController : UIViewController <NSURLConnectionDownloadDelegate, SKPaymentTransactionObserver, SKRequestDelegate, SKProductsRequestDelegate> {
 
     NSMutableArray *issueViewControllers;
     IBOutlet UIScrollView *scrollView;
@@ -54,10 +55,18 @@
 @property (nonatomic) NSInteger numberOfIssuesShown;
 @property (nonatomic) NSInteger numberOfPagesShown;
 
+// In App Purchase
+@property (nonatomic,assign) BOOL purchasing;
+
 
 //- (void)sync:(id) sender;
 -(IBAction) sync:(id) sender;
--(IBAction) subscribe:(id) sender;
+-(IBAction) subscription:(NSString *)productId;
+-(IBAction) freeSubscription:(id) sender;
+-(void) errorWithTransaction:(SKPaymentTransaction *)transaction;
+-(void) finishedTransaction:(SKPaymentTransaction *)transaction;
+-(void) checkReceipt:(NSData *)receipt;
+
 
 //- (void) layout:(IssueViewController *)ivc;
 - (void) layout: (IssueViewController *)ivc setOrientation: (UIInterfaceOrientation) interfaceOrientation;

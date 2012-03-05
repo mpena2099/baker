@@ -36,6 +36,8 @@
 #import "Issue.h"
 #import "Cover.h"
 #import "Content.h"
+#import <StoreKit/StoreKit.h>
+
 
 @implementation BakerAppDelegate
 
@@ -83,16 +85,16 @@
 	}
 	
     
-    /*
     // Newsstand Background downloading
-     Content *newContent = (Content *)[NSEntityDescription insertNewObjectForEntityForName:@"Content" inManagedObjectContext:managedObjectContext];
-
     NKLibrary *nkLib = [NKLibrary sharedLibrary];
     for (NKAssetDownload *asset in [nkLib downloadingAssets]) {
         [asset downloadWithDelegate:LVrootViewController];
     }
-     */
+     
     
+    // StoreKit transaction observer
+    [[SKPaymentQueue defaultQueue] addTransactionObserver:LVrootViewController];
+
     
 	return YES;
 }
