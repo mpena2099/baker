@@ -66,6 +66,10 @@
 	<true/>
 	<key>NSMainNibFile~ipad</key>
 	<string>MainWindow</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>newsstand-content</string>
+	</array>
 	<key>UINewsstandApp</key>
 	<true/>
 	<key>UISupportedInterfaceOrientations</key>
@@ -74,10 +78,6 @@
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>newsstand-content</string>
 	</array>
 </dict>
 </plist>
