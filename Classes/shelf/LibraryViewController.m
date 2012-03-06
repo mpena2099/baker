@@ -59,8 +59,9 @@
 -(IBAction) freeSubscription:(id) sender
 {
     NSLog(@"freeSubscription button pushed");
-    
-    [self subscription:@"CanaMix_Assinatura_Gratuita"];     // <--------------------------
+
+    #warning INSERT YOUR FREE SUBSCRPTION ID
+    [self subscription:@"INSERT HERE YOUR ITUNESCONNECT PRODUCT ID FOR FREE SUBSCRIPTION"];     // <-----------
 }
 
 
@@ -123,47 +124,16 @@
 -(void)finishedTransaction:(SKPaymentTransaction *)transaction {
     NSLog(@"Finished transaction");
     [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
-    /*
-     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Subscription done"
-     message:[NSString stringWithFormat:@"Receipt to be sent: %@\nTransaction ID: %@",transaction.transactionReceipt,transaction.transactionIdentifier]
-     delegate:nil
-     cancelButtonTitle:@"Close"
-     otherButtonTitles:nil];
-     [alert show];
-     [alert release];
-     */
+
     // save receipt
     [[NSUserDefaults standardUserDefaults] setObject:transaction.transactionIdentifier forKey:@"receipt"];
+
     // check receipt
     [self checkReceipt:transaction.transactionReceipt];
 }
 
 
 -(void)checkReceipt:(NSData *)receipt {
-    /*
-    // save receipt
-    NSString *receiptStorageFile = [DocumentsDirectory stringByAppendingPathComponent:@"receipts.plist"];
-    NSMutableArray *receiptStorage = [[NSMutableArray alloc] initWithContentsOfFile:receiptStorageFile];
-    if(!receiptStorage) {
-        receiptStorage = [[NSMutableArray alloc] init];
-    }
-    [receiptStorage addObject:receipt];
-    [receiptStorage writeToFile:receiptStorageFile atomically:YES];
-    [receiptStorage release];
-    [ReceiptCheck validateReceiptWithData:receipt completionHandler:^(BOOL success,NSString *answer){
-        if(success==YES) {
-            NSLog(@"Receipt has been validated: %@",answer);
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Purchase OK" message:nil delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
-            [alert show];
-            [alert release];
-        } else {
-            NSLog(@"Receipt not validated! Error: %@",answer);
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Purchase Error" message:@"Cannot validate receipt" delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
-            [alert show];
-            [alert release];
-        };
-    }];
-    */
     ReceiptCheck *checker = [ReceiptCheck validateReceiptWithData:receipt completionHandler:^(BOOL success,NSString *answer){
         if(success==YES) {
             NSLog(@"Receipt has been validated: %@",answer);
@@ -205,9 +175,6 @@
     } else {
         NSLog(@"LibraryViewController - refresh: connection failed");
     }
-    
-    
-    
     
     return;
 }
@@ -261,7 +228,7 @@
     }
 }
 
-//-(void) layout: (IssueViewController *)ivc 
+
 -(void) layout:(IssueViewController *)ivc setOrientation:(UIInterfaceOrientation) interfaceOrientation 
 {
     
@@ -403,19 +370,6 @@
         // get and set the managedObjectContext  from the appdelegate object
         BakerAppDelegate *appDelegate = (BakerAppDelegate *)[[UIApplication sharedApplication] delegate];
         [self setManagedObjectContext:[appDelegate managedObjectContext]];
-        
-        /*
-        UIBarButtonItem* syncButton = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh 
-                                                                                     target:self 
-                                                                                     action:@selector(sync:)] autorelease];
-        
-        
-        NSArray *items = [NSArray arrayWithObjects: 
-                          syncButton,
-                          nil];
-        [self setToolbarItems:items];
-        */
-        
     }
     return self;
 }
@@ -510,9 +464,6 @@
     [[self view] setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"bg"]]];
     
     
-    //[[UIBarButtonItem appearance] setBackgroundColor:[UIColor colorWithRed:1.0 green:1.0 blue:1.0 alpha:1.0]];
-    
-    
     [self updateList];
 }
 
@@ -599,6 +550,8 @@
     return;
 }
 
+
+//- (void)connectionDidFinishDownloading:(NSURLConnection *)connection destinationURL:(NSURL *) destinationURL
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
     
@@ -757,5 +710,10 @@
     [receivedData release];
     return;
 }
+
+/*
+- (void)connectionDidFinishDownloading:(NSURLConnection *)connection destinationURL:(NSURL *) destinationURL {
+}
+*/
 
 @end
