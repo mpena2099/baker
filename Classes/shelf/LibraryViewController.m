@@ -134,15 +134,30 @@
 
 
 -(void)checkReceipt:(NSData *)receipt {
-    ReceiptCheck *checker = [ReceiptCheck validateReceiptWithData:receipt completionHandler:^(BOOL success,NSString *answer){
+    // save receipt
+    /*
+    NSString *receiptStorageFile = [DocumentsDirectory stringByAppendingPathComponent:@"receipts.plist"];
+    NSMutableArray *receiptStorage = [[NSMutableArray alloc] initWithContentsOfFile:receiptStorageFile];
+    if(!receiptStorage) {
+        receiptStorage = [[NSMutableArray alloc] init];
+    }
+    [receiptStorage addObject:receipt];
+    [receiptStorage writeToFile:receiptStorageFile atomically:YES];
+    [receiptStorage release];
+    */
+    [ReceiptCheck validateReceiptWithData:receipt completionHandler:^(BOOL success,NSString *answer){
         if(success==YES) {
             NSLog(@"Receipt has been validated: %@",answer);
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Purchase OK" message:nil delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
+            [alert show];
+            [alert release];
         } else {
             NSLog(@"Receipt not validated! Error: %@",answer);
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Purchase Error" message:@"Cannot validate receipt" delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
+            [alert show];
+            [alert release];
         };
-        [checker release];
     }];
-    [checker retain];
 }
 
 
