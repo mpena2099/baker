@@ -279,6 +279,92 @@
 
 
 #pragma mark - View lifecycle
+- (void) loadBanners
+{
+    // Determine JSON path and file name
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *filePath = [NSString stringWithFormat:@"%@/%@", [paths objectAtIndex:0],@"banners.json"];  
+    NSString *filePath2 = [NSString stringWithFormat:@"%@/%@", [paths objectAtIndex:0],@"banners.json.temp"];
+    
+    // Download and save file
+    NSURL *url = [NSURL URLWithString:@"http://www.yag.com.br/canamix/banners.json"];
+    NSData *urlData = [NSData dataWithContentsOfURL:url];
+    [urlData writeToFile:filePath2 atomically:YES];
+    
+    NSFileManager *filemgr;
+    filemgr = [NSFileManager defaultManager];
+    
+    // See if that is a local json file
+    if ([filemgr fileExistsAtPath:filePath ] == YES) {
+        NSLog (@"File exists");
+        
+        // Compare local and remote files
+        if ([filemgr contentsEqualAtPath:filePath andPath:filePath2] == NO) {
+            NSLog (@"File contents do not match");
+            
+            // Remove old file
+            if ([filemgr removeItemAtPath:filePath error: NULL]  == YES)
+                NSLog (@"Remove successful");
+            else
+                NSLog (@"Remove failed");
+            
+            // Rename file as local file
+            [filemgr copyItemAtPath:filePath2 toPath:filePath error: NULL];
+            
+        } else {
+            NSLog (@"File contents match");
+        }
+        
+    } else {
+        NSLog (@"File not found");
+        
+        // Rename file as local file
+        [filemgr copyItemAtPath:filePath2 toPath:filePath error: NULL];
+    }
+    
+    // See local JSON file
+    NSData *jsonData = [NSData dataWithContentsOfFile:filePath];
+    
+    // Transform o JSON in NSDictionary
+    NSError *error = nil;
+    NSArray *jsonArray = [NSJSONSerialization JSONObjectWithData:jsonData options:NSJSONReadingMutableContainers error: &error];
+    
+    // Create array and initializes it
+    NSMutableArray *banners;
+    banners = [[NSMutableArray alloc] init];
+    
+    // Ckeck JSON file and get data
+    if (!jsonArray) {
+        NSLog(@"Error parsing JSON: %@", error);
+    } else {
+        for (NSDictionary *item in jsonArray) {
+            
+            NSLog(@"Name: %@", [item objectForKey:@"name"]);
+            NSLog(@"Site: %@", [item objectForKey:@"siteurl"]);
+            NSLog(@"File: %@", [item objectForKey:@"fileurl"]);
+            
+            // Download and save images
+            NSString *imageName = [[[item objectForKey:@"fileurl"] componentsSeparatedByString: @"/"] lastObject];
+            NSString *imagePath = [NSString stringWithFormat:@"%@/%@", [paths objectAtIndex:0], imageName];  
+            NSURL *url2 = [NSURL URLWithString:[item objectForKey:@"fileurl"]];
+            NSData *urlData2 = [NSData dataWithContentsOfURL:url2];
+            [urlData2 writeToFile:imagePath atomically:YES];
+            
+            // Add image to banner array
+            NSData *photoData = [NSData dataWithContentsOfFile:imagePath];
+            UIImage *imageUI = [UIImage imageWithData:photoData];
+            [banners addObject:imageUI];
+        }
+    }
+    
+    // Set and start banner animation
+    shelfImage.animationImages = banners;
+    shelfImage.animationDuration = [banners count] * 5.0;
+    shelfImage.animationRepeatCount = 0;
+    [shelfImage startAnimating];
+    [self.view addSubview:shelfImage];
+}
+
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad
 {
@@ -299,6 +385,8 @@
     }
     
     
+    // Load banners             // <----------------------------------
+    [self loadBanners];
 }
 
 - (void) updateDownloadingAssetsOverlay:(UIInterfaceOrientation)interfaceOrientation
