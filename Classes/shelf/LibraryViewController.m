@@ -362,7 +362,7 @@
     shelfImage.animationDuration = [banners count] * 5.0;
     shelfImage.animationRepeatCount = 0;
     [shelfImage startAnimating];
-    [self.view addSubview:shelfImage];
+    //[self.view addSubview:shelfImage];
 }
 
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
