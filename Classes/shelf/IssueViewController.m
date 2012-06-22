@@ -129,12 +129,15 @@
 }
 
 -(IBAction) btnClicked:(id) sender {
-    
-    if  (nkIssue.status==NKIssueContentStatusDownloading){
-        // still downloading
+    /*
+     if  (nkIssue.status==NKIssueContentStatusDownloading){
+     // still downloading
+     [buttonView setTitle:@"Wait..." forState:UIControlStateNormal];
+     }
+     else */
+    if (nkIssue.status==NKIssueContentStatusNone){
+        // wait message
         [buttonView setTitle:@"Wait..." forState:UIControlStateNormal];
-    }
-    else if (nkIssue.status==NKIssueContentStatusNone){
         // start download
         NSURL *downloadURL = [publisher contentURLForIssueWithName:nkIssue.name];
         if(!downloadURL) return;
@@ -161,7 +164,7 @@
         NSLog(@"IssueViewController - Opening BakerViewController");  
         BakerAppDelegate *appDelegate = (BakerAppDelegate *)[[UIApplication sharedApplication] delegate];
         UINavigationController* navigationController = [appDelegate navigationController];
-
+        
         BakerViewController * bvc = [BakerViewController alloc];
         
         [bvc initWithMaterial:nkIssue];
@@ -223,7 +226,7 @@
     NSLog(@"Issue downloaded: %@", dnlIssue); // should be the same as nkIssue
     NSString *contentPath = [publisher downloadPathForIssue:nkIssue];
     NSLog(@"File is being unzipped to %@",contentPath);
-
+    
     [SSZipArchive unzipFileAtPath:[destinationURL path] toDestination:contentPath];
     // update the Newsstand icon
     UIImage *img = [publisher coverImageForIssue:nkIssue];
