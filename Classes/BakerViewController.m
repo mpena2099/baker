@@ -172,7 +172,7 @@
         //toolbar.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin;
         toolbar.frame = CGRectMake(0, 0, pageWidth, 44);
         
-        UIBarButtonItem *back = [[[UIBarButtonItem alloc]initWithTitle:@"Back to Library" style:UIBarButtonItemStyleBordered target:self action:@selector(Close)] autorelease];
+        UIBarButtonItem *back = [[[UIBarButtonItem alloc]initWithTitle:@"Voltar" style:UIBarButtonItemStyleBordered target:self action:@selector(Close)] autorelease];
         UIBarButtonItem *space = [[[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:self action:nil] autorelease];
         
         [toolbar setItems:[NSArray arrayWithObjects:back,space, nil]];

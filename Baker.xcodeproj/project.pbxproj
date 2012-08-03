@@ -18,6 +18,9 @@
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
 		288765FD0DF74451002DB57D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765FC0DF74451002DB57D /* CoreGraphics.framework */; };
 		8D5A1C2814BCB722005BE276 /* newstand.png in Resources */ = {isa = PBXBuildFile; fileRef = 8D5A1C2714BCB722005BE276 /* newstand.png */; };
+		99C5F0FF15CC612200A7F60A /* canamix_logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 99C5F0FE15CC612200A7F60A /* canamix_logo.png */; };
+		99CD790A15CC6D7B006C40CF /* Default-Portrait~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 99C5F10015CC613100A7F60A /* Default-Portrait~ipad.png */; };
+		99CD790C15CC6DA3006C40CF /* Default-Landscape~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 99C5F10215CC613F00A7F60A /* Default-Landscape~ipad.png */; };
 		9E12CF131495AEB100FFB1DF /* IssueViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9E12CF0F1495AEB100FFB1DF /* IssueViewController.xib */; };
 		9E12CF141495AEB100FFB1DF /* LibraryViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9E12CF101495AEB100FFB1DF /* LibraryViewController.xib */; };
 		9E12CF151495AEB100FFB1DF /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9E12CF111495AEB100FFB1DF /* MainWindow.xib */; };
@@ -129,13 +132,16 @@
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1D3623240D0F684500981E51 /* BakerAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BakerAppDelegate.h; sourceTree = "<group>"; };
 		1D3623250D0F684500981E51 /* BakerAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BakerAppDelegate.m; sourceTree = "<group>"; };
-		1D6058910D05DD3D006BFB54 /* sitelessmagazine.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = sitelessmagazine.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1D6058910D05DD3D006BFB54 /* RevistaCanaMix.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RevistaCanaMix.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		288765FC0DF74451002DB57D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		32CA4F630368D1EE00C91783 /* Baker_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Baker_Prefix.pch; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Baker-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Baker-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
 		8D5A1C2714BCB722005BE276 /* newstand.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = newstand.png; sourceTree = "<group>"; };
+		99C5F0FE15CC612200A7F60A /* canamix_logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = canamix_logo.png; sourceTree = "<group>"; };
+		99C5F10015CC613100A7F60A /* Default-Portrait~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Portrait~ipad.png"; sourceTree = "<group>"; };
+		99C5F10215CC613F00A7F60A /* Default-Landscape~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Landscape~ipad.png"; sourceTree = "<group>"; };
 		9E12CF0F1495AEB100FFB1DF /* IssueViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = IssueViewController.xib; path = shelf/ui/IssueViewController.xib; sourceTree = "<group>"; };
 		9E12CF101495AEB100FFB1DF /* LibraryViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = LibraryViewController.xib; path = shelf/ui/LibraryViewController.xib; sourceTree = "<group>"; };
 		9E12CF111495AEB100FFB1DF /* MainWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = MainWindow.xib; path = shelf/ui/MainWindow.xib; sourceTree = "<group>"; };
@@ -292,9 +298,9 @@
 				D2B5B1ED141EA44800C8C333 /* lib */,
 				D2690B5D13EB46200011CC7D /* ui */,
 				D2A198A81375972600C6BE2F /* IndexViewController.h */,
+				D2A198A91375972600C6BE2F /* IndexViewController.m */,
 				9E57EFE914EAAB48000BD3B4 /* BakerViewController.h */,
 				9E57EFEA14EAAB48000BD3B4 /* BakerViewController.m */,
-				D2A198A91375972600C6BE2F /* IndexViewController.m */,
 				D20915BE13CB9C7800D3B55B /* Properties.h */,
 				D20915BF13CB9C7800D3B55B /* Properties.m */,
 				1D3623240D0F684500981E51 /* BakerAppDelegate.h */,
@@ -308,7 +314,7 @@
 		19C28FACFE9D520D11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				1D6058910D05DD3D006BFB54 /* sitelessmagazine.app */,
+				1D6058910D05DD3D006BFB54 /* RevistaCanaMix.app */,
 				D281D06313549EDC009F1B11 /* UnitTests.octest */,
 			);
 			name = Products;
@@ -317,6 +323,9 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				99C5F10215CC613F00A7F60A /* Default-Landscape~ipad.png */,
+				99C5F10015CC613100A7F60A /* Default-Portrait~ipad.png */,
+				99C5F0FE15CC612200A7F60A /* canamix_logo.png */,
 				BF2F993F1269379900E356EF /* book */,
 				080E96DDFE201D6D7F000001 /* Classes */,
 				D281CE9B13545C0E009F1B11 /* Tests */,
@@ -595,7 +604,7 @@
 			);
 			name = Baker;
 			productName = Baker;
-			productReference = 1D6058910D05DD3D006BFB54 /* sitelessmagazine.app */;
+			productReference = 1D6058910D05DD3D006BFB54 /* RevistaCanaMix.app */;
 			productType = "com.apple.product-type.application";
 		};
 		D281D06213549EDC009F1B11 /* UnitTests */ = {
@@ -672,6 +681,9 @@
 				1AA03F1114F7718500DCC462 /* toolbar.png in Resources */,
 				1A7FC2D514F9D0920089916E /* top_bg.png in Resources */,
 				CC96EBBF152ADEFB00F85399 /* SubscriptionsViewController.xib in Resources */,
+				99C5F0FF15CC612200A7F60A /* canamix_logo.png in Resources */,
+				99CD790A15CC6D7B006C40CF /* Default-Portrait~ipad.png in Resources */,
+				99CD790C15CC6DA3006C40CF /* Default-Landscape~ipad.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -796,7 +808,7 @@
 				INFOPLIST_FILE = "Baker-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
 				OTHER_LDFLAGS = "";
-				PRODUCT_NAME = sitelessmagazine;
+				PRODUCT_NAME = RevistaCanaMix;
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 2;
@@ -818,7 +830,7 @@
 				INFOPLIST_FILE = "Baker-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
 				OTHER_LDFLAGS = "";
-				PRODUCT_NAME = sitelessmagazine;
+				PRODUCT_NAME = RevistaCanaMix;
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 2;
@@ -857,7 +869,7 @@
 				INFOPLIST_FILE = "Baker-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
 				OTHER_LDFLAGS = "";
-				PRODUCT_NAME = sitelessmagazine;
+				PRODUCT_NAME = RevistaCanaMix;
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 2;

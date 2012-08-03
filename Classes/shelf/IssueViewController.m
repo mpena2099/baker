@@ -87,15 +87,15 @@
     [progressView setHidden:YES];
     
     if(nkIssue.status==NKIssueContentStatusAvailable) {
-        [buttonView setTitle:@"Archive" forState:UIControlStateNormal];
+        [buttonView setTitle:@"Arquivar" forState:UIControlStateNormal];
     } 
     else if(nkIssue.status==NKIssueContentStatusDownloading) {
-        [buttonView setTitle:@"Wait..." forState:UIControlStateNormal];
+        [buttonView setTitle:@"Aguarde..." forState:UIControlStateNormal];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(kLibraryViewDidFinishDownloading:) name:kLibraryViewControllerDidFinishDownloading object:nkIssue];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(LibraryViewDidFailDownloading:) name:kLibraryViewControllerDidFailDownloading object:nkIssue];
     } 
     else {
-        [buttonView setTitle:@"Download" forState:UIControlStateNormal];
+        [buttonView setTitle:@"Baixar" forState:UIControlStateNormal];
         
     }
     return;
@@ -105,14 +105,14 @@
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kLibraryViewControllerDidFinishDownloading object:nkIssue];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kLibraryViewControllerDidFailDownloading object:nkIssue];
-    [buttonView setTitle:@"Archive" forState:UIControlStateNormal];
+    [buttonView setTitle:@"Arquivar" forState:UIControlStateNormal];
 }
 
 - (void)LibraryViewDidFailDownloading:(NSNotification*)not
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kLibraryViewControllerDidFinishDownloading object:nkIssue];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kLibraryViewControllerDidFailDownloading object:nkIssue];
-    [buttonView setTitle:@"Download" forState:UIControlStateNormal];
+    [buttonView setTitle:@"Baixar" forState:UIControlStateNormal];
 }
 
 - (void)viewDidUnload
@@ -137,7 +137,7 @@
     else */
     if (nkIssue.status==NKIssueContentStatusNone){
         // wait message
-        [buttonView setTitle:@"Wait..." forState:UIControlStateNormal];
+        [buttonView setTitle:@"Aguarde..." forState:UIControlStateNormal];
         // start download
         NSURL *downloadURL = [publisher contentURLForIssueWithName:nkIssue.name];
         if(!downloadURL) return;
@@ -148,11 +148,11 @@
     else if (nkIssue.status==NKIssueContentStatusAvailable){
         // archive
         UIAlertView *updateAlert = [[UIAlertView alloc] 
-                                    initWithTitle: @"Are you sure you want to archive this item?"
-                                    message: @"This item will be removed from your device. You may download it at anytime for free."
+                                    initWithTitle: @"Você tem certeza que quer arquivar esse item?"
+                                    message: @"Esse itemm será removido do seu iPad. Você poderá baixa-lo novamente a qualquer hora."
                                     delegate: self
-                                    cancelButtonTitle: @"Cancel"
-                                    otherButtonTitles:@"Archive",nil];
+                                    cancelButtonTitle: @"Cancelar"
+                                    otherButtonTitles:@"Arquivar",nil];
         [updateAlert show];
         [updateAlert release];
     }
@@ -222,7 +222,7 @@
     if(buttonIndex == 1){
         NSLog(@"Archiving %@",nkIssue);
         nkIssue = [publisher removeIssueAtIndex:[self index]];
-        [buttonView setTitle:@"Download" forState:UIControlStateNormal];
+        [buttonView setTitle:@"Baixar" forState:UIControlStateNormal];
         [progressView setHidden:YES];
     }
 }
@@ -260,7 +260,7 @@
         [[UIApplication sharedApplication] setNewsstandIconImage:img]; 
         [[UIApplication sharedApplication] setApplicationIconBadgeNumber:1];
     }
-    [buttonView setTitle:@"Archive" forState:UIControlStateNormal];
+    [buttonView setTitle:@"Arquivar" forState:UIControlStateNormal];
 }
 
 @end
