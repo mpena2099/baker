@@ -255,14 +255,17 @@
     //Library background
     [[self view] setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"bg"]]];
     
+    /*
     if ([self isDownloadingAssets]){
         [self updateDownloadingAssetsOverlay:[self interfaceOrientation]];        
-    }   
+    }
+    */
     
     // Load banners             // <----------------------------------
     [self loadBanners];
 }
 
+/*
 - (void) updateDownloadingAssetsOverlay:(UIInterfaceOrientation)interfaceOrientation
 {
     float currentProgress = 0.0f;
@@ -314,6 +317,7 @@
     [self.view addSubview:downloadView];
     [l release];
 }
+*/
 
 - (void) hideDownloadingAssetsOverlay
 {
@@ -519,11 +523,14 @@
     // Update issues view
     [self updateShelf:toInterfaceOrientation];
     
+    */
+    /*
     // update overlay if necessary
     if ([self isDownloadingAssets]){
         [self updateDownloadingAssetsOverlay:toInterfaceOrientation];
     }
      */
+     
      
 }
 
