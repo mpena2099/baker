@@ -87,7 +87,7 @@
     [progressView setHidden:YES];
     
     if(nkIssue.status==NKIssueContentStatusAvailable) {
-        [buttonView setTitle:@"Arquivar" forState:UIControlStateNormal];
+        [buttonView setTitle:@"Excluir" forState:UIControlStateNormal];
     } 
     else if(nkIssue.status==NKIssueContentStatusDownloading) {
         [buttonView setTitle:@"Aguarde..." forState:UIControlStateNormal];
@@ -105,7 +105,7 @@
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kLibraryViewControllerDidFinishDownloading object:nkIssue];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kLibraryViewControllerDidFailDownloading object:nkIssue];
-    [buttonView setTitle:@"Arquivar" forState:UIControlStateNormal];
+    [buttonView setTitle:@"Excluir" forState:UIControlStateNormal];
 }
 
 - (void)LibraryViewDidFailDownloading:(NSNotification*)not
@@ -148,11 +148,11 @@
     else if (nkIssue.status==NKIssueContentStatusAvailable){
         // archive
         UIAlertView *updateAlert = [[UIAlertView alloc] 
-                                    initWithTitle: @"Você tem certeza que quer arquivar esse item?"
-                                    message: @"Esse itemm será removido do seu iPad. Você poderá baixa-lo novamente a qualquer hora."
+                                    initWithTitle: @"Você tem certeza que quer excluir esse item?"
+                                    message: @"Esse item será removido do seu iPad. Você poderá baixa-lo novamente a qualquer hora."
                                     delegate: self
                                     cancelButtonTitle: @"Cancelar"
-                                    otherButtonTitles:@"Arquivar",nil];
+                                    otherButtonTitles:@"Excluir",nil];
         [updateAlert show];
         [updateAlert release];
     }
@@ -260,7 +260,7 @@
         [[UIApplication sharedApplication] setNewsstandIconImage:img]; 
         [[UIApplication sharedApplication] setApplicationIconBadgeNumber:1];
     }
-    [buttonView setTitle:@"Arquivar" forState:UIControlStateNormal];
+    [buttonView setTitle:@"Excluir" forState:UIControlStateNormal];
 }
 
 @end
