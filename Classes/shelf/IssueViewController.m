@@ -245,6 +245,9 @@
 }
 
 -(void)connectionDidFinishDownloading:(NSURLConnection *)connection destinationURL:(NSURL *)destinationURL {
+    
+    NSLog(@"AAAAA");
+    
     // copy file to destination URL
     [progressView setHidden:YES];
     NKAssetDownload *dnl = connection.newsstandAssetDownload;
@@ -253,13 +256,21 @@
     NSString *contentPath = [publisher downloadPathForIssue:nkIssue];
     NSLog(@"File is being unzipped to %@",contentPath);
 
-    [SSZipArchive unzipFileAtPath:[destinationURL path] toDestination:contentPath];
+    //[SSZipArchive unzipFileAtPath:[destinationURL path] toDestination:contentPath];
+    
     // update the Newsstand icon
     UIImage *img = [publisher coverImageForIssue:nkIssue];
-    if(img) {
-        [[UIApplication sharedApplication] setNewsstandIconImage:img]; 
+    if (img) {
+        NSLog(@"UPDATED!");
+
+        [[UIApplication sharedApplication] setNewsstandIconImage:img];
         [[UIApplication sharedApplication] setApplicationIconBadgeNumber:1];
     }
+    
+    
+    [SSZipArchive unzipFileAtPath:[destinationURL path] toDestination:contentPath];
+
+    
     [buttonView setTitle:@"Excluir" forState:UIControlStateNormal];
 }
 

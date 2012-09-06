@@ -560,6 +560,10 @@
 }
 
 -(void)connectionDidFinishDownloading:(NSURLConnection *)connection destinationURL:(NSURL *)destinationURL {
+    
+    NSLog(@"BBBB");
+
+    
     // copy file to destination URL
     NKAssetDownload *dnl = connection.newsstandAssetDownload;
     NKIssue *dnlIssue = dnl.issue;
@@ -570,10 +574,12 @@
     [SSZipArchive unzipFileAtPath:[destinationURL path] toDestination:contentPath];
     if (publisher){
         
-        // update the Newsstand icon
+        // update the Newsstand icon //
         UIImage *img = [publisher coverImageForIssue:dnlIssue];
         if(img) {
-            [[UIApplication sharedApplication] setNewsstandIconImage:img]; 
+            NSLog(@"UPDATED 2!");
+
+            [[UIApplication sharedApplication] setNewsstandIconImage:img];
             [[UIApplication sharedApplication] setApplicationIconBadgeNumber:1];
         }
         
